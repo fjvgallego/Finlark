@@ -5,7 +5,7 @@
 //  FIN-9 Round 2: building blocks shared by the Round 2 Home explorations. They combine the traits the
 //  owner picked from Round 1: Glasshouse's glass tiles and backdrop, Mosaic's bento tiles, Carousel's
 //  slider and Quiet's compact title. Every variation sits in the same tab shell, picked in Round 3:
-//  a native tab bar whose bottom accessory holds quick add, plus the separate search tab.
+//  a native tab bar whose bottom accessory holds quick add.
 //
 
 #if DEBUG
@@ -203,8 +203,7 @@ extension View {
 
 // MARK: - Tab shell
 
-/// The native tab bar shared by every Round 2 variation: Home, History, Settings and the separate
-/// search tab. Quick add (HOM-007, TRX-001) lives in the bottom accessory above the tab bar on Home and
+/// The native tab bar shared by every Round 2 variation: Home, History and Settings. Quick add (HOM-007, TRX-001) lives in the bottom accessory above the tab bar on Home and
 /// History (TRX-001), with Add expense first and an Income shortcut. When scrolling down, the tab bar
 /// minimizes and the accessory moves inline next to it.
 struct R2TabShell<Home: View>: View {
@@ -212,7 +211,6 @@ struct R2TabShell<Home: View>: View {
         case home
         case history
         case settings
-        case search
     }
 
     let model: ExplorationHomeModel
@@ -238,19 +236,13 @@ struct R2TabShell<Home: View>: View {
             }
             Tab("History", systemImage: "clock.arrow.circlepath", value: AppTab.history) {
                 NavigationStack {
-                    R2HistoryScreen(model: model, title: "History")
+                    R2HistoryScreen(model: model)
                         .r2Destinations()
                 }
             }
             Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {
                 NavigationStack {
                     R2SettingsScreen()
-                }
-            }
-            Tab(value: AppTab.search, role: .search) {
-                NavigationStack {
-                    R2HistoryScreen(model: model, title: "Search", isSearchable: true)
-                        .r2Destinations()
                 }
             }
         }
@@ -354,11 +346,9 @@ extension View {
 
 // MARK: - History tab (mock of TRX-005)
 
-/// A light mock of the History screen so the tab bar feels real. Also backs the search tab.
+/// A light mock of the History screen so the tab bar feels real, with search in notes (TRX-005).
 struct R2HistoryScreen: View {
     let model: ExplorationHomeModel
-    let title: LocalizedStringKey
-    var isSearchable = false
 
     @State private var searchText = ""
 
@@ -401,22 +391,9 @@ struct R2HistoryScreen: View {
                 ContentUnavailableView.search(text: searchText)
             }
         }
-        .navigationTitle(title)
+        .navigationTitle("History")
         .navigationBarTitleDisplayMode(.inline)
-        .modifier(R2OptionalSearch(isEnabled: isSearchable, text: $searchText))
-    }
-}
-
-private struct R2OptionalSearch: ViewModifier {
-    let isEnabled: Bool
-    @Binding var text: String
-
-    func body(content: Content) -> some View {
-        if isEnabled {
-            content.searchable(text: $text, prompt: Text("Search notes"))
-        } else {
-            content
-        }
+        .searchable(text: $searchText, prompt: Text("Search notes"))
     }
 }
 
