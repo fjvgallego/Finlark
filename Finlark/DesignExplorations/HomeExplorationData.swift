@@ -375,17 +375,39 @@ struct ExplorationAddSheet: View {
 
 // MARK: - Shared building blocks
 
+/// How icons and avatars are drawn: `solid` (white symbol on a filled circle, the system look) or
+/// `soft` (symbol in the category color on a pale tint of it, in a rounded square).
+enum ExplorationIconStyle {
+    case solid
+    case soft
+}
+
+extension EnvironmentValues {
+    @Entry var explorationIconStyle: ExplorationIconStyle = .solid
+}
+
 struct ExplorationCategoryIcon: View {
     let category: ExplorationCategory
     @ScaledMetric private var size: CGFloat = 36
+    @Environment(\.explorationIconStyle) private var style
 
     var body: some View {
-        Image(systemName: category.symbol)
-            .font(.system(size: size * 0.45, weight: .semibold))
-            .foregroundStyle(.white)
-            .frame(width: size, height: size)
-            .background(category.color.gradient, in: .circle)
-            .accessibilityHidden(true)
+        switch style {
+        case .solid:
+            Image(systemName: category.symbol)
+                .font(.system(size: size * 0.45, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: size, height: size)
+                .background(category.color.gradient, in: .circle)
+                .accessibilityHidden(true)
+        case .soft:
+            Image(systemName: category.symbol)
+                .font(.system(size: size * 0.42, weight: .semibold))
+                .foregroundStyle(category.color)
+                .frame(width: size, height: size)
+                .background(category.color.opacity(0.16), in: .rect(cornerRadius: size * 0.3, style: .continuous))
+                .accessibilityHidden(true)
+        }
     }
 }
 

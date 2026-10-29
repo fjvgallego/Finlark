@@ -4,6 +4,8 @@
 //
 //  FIN-9 Round 6 "Marsh": like Fjord, but a segmented control (Month | Categories) switches the view
 //  instead of a swipe. More discoverable than a gesture, and it names both views up front.
+//  The month view uses Tern's scrubbable category bar, and icons and avatars use the soft style
+//  (tinted rounded squares) instead of the system look.
 //
 
 #if DEBUG
@@ -51,6 +53,7 @@ struct MarshHomeView: View {
                 R4RecentList(snapshot: snapshot)
             }
         }
+        .environment(\.explorationIconStyle, .soft)
     }
 
     private var balanceTile: some View {
@@ -69,7 +72,7 @@ struct MarshHomeView: View {
                     VStack(spacing: 0) {
                         R6MonthRows(snapshot: snapshot)
                         Divider()
-                        R5FocusBar(snapshot: snapshot)
+                        R5ScrubBar(snapshot: snapshot)
                             .padding(.vertical, 10)
                     }
                 case .categories:

@@ -29,6 +29,13 @@ struct R6Debtor: Identifiable {
     var total: Decimal { shares.reduce(0) { $0 + $1.remaining } }
     var initial: String { String(name.prefix(1)) }
 
+    /// A stable color per person, so the same friend always looks the same.
+    var color: Color {
+        let palette: [Color] = [.orange, .pink, .teal, .purple, .indigo, .mint, .cyan]
+        let seed = name.unicodeScalars.reduce(0) { $0 + Int($1.value) }
+        return palette[seed % palette.count]
+    }
+
     /// Matches the sample snapshot: €85.00 owed by 2 people.
     static let sample: [R6Debtor] = [
         R6Debtor(name: "Marta", shares: [
@@ -131,12 +138,14 @@ struct R6OwedBar: View {
         .scrollIndicators(.hidden)
     }
 
+    @Environment(\.explorationIconStyle) private var iconStyle
+
     private func personChip(_ debtor: R6Debtor) -> some View {
         Button {
             selectedID = debtor.id
         } label: {
             HStack(spacing: 8) {
-                R6Avatar(initial: debtor.initial)
+                R6Avatar(debtor: debtor)
                 VStack(alignment: .leading, spacing: 0) {
                     Text(debtor.name)
                         .font(.subheadline.weight(.semibold))
@@ -149,7 +158,8 @@ struct R6OwedBar: View {
             .padding(.leading, 6)
             .padding(.trailing, 14)
             .padding(.vertical, 6)
-            .background(.fill.tertiary, in: .capsule)
+            .background(iconStyle == .soft ? AnyShapeStyle(debtor.color.opacity(0.12)) : AnyShapeStyle(.fill.tertiary),
+                        in: .capsule)
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
@@ -183,7 +193,7 @@ private struct R6SettlePopover: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 10) {
-                R6Avatar(initial: debtor.initial)
+                R6Avatar(debtor: debtor)
                 VStack(alignment: .leading, spacing: 0) {
                     Text(debtor.name)
                         .font(.headline)
@@ -231,16 +241,27 @@ private struct R6SettlePopover: View {
 }
 
 private struct R6Avatar: View {
-    let initial: String
+    let debtor: R6Debtor
     @ScaledMetric private var size: CGFloat = 30
+    @Environment(\.explorationIconStyle) private var style
 
     var body: some View {
-        Text(initial)
-            .font(.subheadline.weight(.bold))
-            .foregroundStyle(.white)
-            .frame(width: size, height: size)
-            .background(Color.accentColor.gradient, in: .circle)
-            .accessibilityHidden(true)
+        switch style {
+        case .solid:
+            Text(debtor.initial)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: size, height: size)
+                .background(Color.accentColor.gradient, in: .circle)
+                .accessibilityHidden(true)
+        case .soft:
+            Text(debtor.initial)
+                .font(.system(.subheadline, design: .rounded, weight: .bold))
+                .foregroundStyle(debtor.color)
+                .frame(width: size, height: size)
+                .background(debtor.color.opacity(0.2), in: .rect(cornerRadius: size * 0.32, style: .continuous))
+                .accessibilityHidden(true)
+        }
     }
 }
 
