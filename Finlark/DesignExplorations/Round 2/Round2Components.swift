@@ -203,14 +203,14 @@ extension View {
 
 // MARK: - Tab shell
 
-/// The native tab bar shared by every Round 2 variation: Home, Transactions, Settings and the separate
+/// The native tab bar shared by every Round 2 variation: Home, History, Settings and the separate
 /// search tab. Quick add (HOM-007, TRX-001) lives in the bottom accessory above the tab bar on Home and
-/// Transactions, with Add expense first and an Income shortcut. When scrolling down, the tab bar
+/// History (TRX-001), with Add expense first and an Income shortcut. When scrolling down, the tab bar
 /// minimizes and the accessory moves inline next to it.
 struct R2TabShell<Home: View>: View {
     private enum AppTab: Hashable {
         case home
-        case transactions
+        case history
         case settings
         case search
     }
@@ -236,9 +236,9 @@ struct R2TabShell<Home: View>: View {
                         .r2Destinations()
                 }
             }
-            Tab("Transactions", systemImage: "list.bullet.rectangle", value: AppTab.transactions) {
+            Tab("History", systemImage: "clock.arrow.circlepath", value: AppTab.history) {
                 NavigationStack {
-                    R2TransactionsScreen(model: model, title: "Transactions")
+                    R2HistoryScreen(model: model, title: "History")
                         .r2Destinations()
                 }
             }
@@ -249,19 +249,19 @@ struct R2TabShell<Home: View>: View {
             }
             Tab(value: AppTab.search, role: .search) {
                 NavigationStack {
-                    R2TransactionsScreen(model: model, title: "Search", isSearchable: true)
+                    R2HistoryScreen(model: model, title: "Search", isSearchable: true)
                         .r2Destinations()
                 }
             }
         }
         .tabBarMinimizeBehavior(.onScrollDown)
-        .tabViewBottomAccessory(isEnabled: selection == .home || selection == .transactions) {
+        .tabViewBottomAccessory(isEnabled: selection == .home || selection == .history) {
             R2QuickAddAccessory(model: model)
         }
         .environment(router)
         .onChange(of: router.requested) { _, destination in
             guard destination != nil else { return }
-            selection = .transactions
+            selection = .history
             router.requested = nil
         }
         .sheet(item: $model.addingType) { type in
@@ -352,10 +352,10 @@ extension View {
     }
 }
 
-// MARK: - Transactions tab (mock of TRX-005)
+// MARK: - History tab (mock of TRX-005)
 
-/// A light mock of the Transactions screen so the tab bar feels real. Also backs the search tab.
-struct R2TransactionsScreen: View {
+/// A light mock of the History screen so the tab bar feels real. Also backs the search tab.
+struct R2HistoryScreen: View {
     let model: ExplorationHomeModel
     let title: LocalizedStringKey
     var isSearchable = false

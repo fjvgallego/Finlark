@@ -263,7 +263,7 @@ struct TidepoolHomeView: View {
         R2Tile {
             VStack(alignment: .leading, spacing: 14) {
                 R2TileHeader(title: "Recent", symbol: "clock.fill") {
-                    R2Link(destination: .history) { Text("See all") }
+                    R2Link(destination: .history) { Text("History") }
                         .font(.subheadline.weight(.semibold))
                 }
                 ForEach(snapshot.recentTransactions) { transaction in

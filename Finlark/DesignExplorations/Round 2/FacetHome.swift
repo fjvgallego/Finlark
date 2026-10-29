@@ -38,7 +38,7 @@ struct FacetHomeView: View {
                             }
                         }
                         sectionHeader("Recent") {
-                            R2Link(destination: .history) { Text("See all") }
+                            R2Link(destination: .history) { Text("History") }
                                 .font(.subheadline.weight(.semibold))
                         }
                         recentChips
@@ -239,7 +239,7 @@ struct FacetHomeView: View {
                             .glassEffect(.regular.interactive(), in: .circle)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(Text("See all transactions"))
+                    .accessibilityLabel(Text("See all in History"))
                 }
                 .fixedSize(horizontal: false, vertical: true)
                 .scrollTargetLayout()
