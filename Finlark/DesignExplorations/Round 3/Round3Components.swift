@@ -553,7 +553,7 @@ struct R3RemainingText: View {
     }
 }
 
-private struct R3PlanFigure: View {
+struct R3PlanFigure: View {
     enum Swatch {
         case spent(Color)
         case projected(Color)
@@ -596,7 +596,7 @@ private struct R3PlanFigure: View {
     }
 }
 
-private struct R3PlanInvite: View {
+struct R3PlanInvite: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Set up your Monthly Plan")

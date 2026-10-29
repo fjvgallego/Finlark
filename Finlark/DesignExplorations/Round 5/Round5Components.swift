@@ -26,7 +26,7 @@ struct R5PlanPaceTile: View {
                 VStack(alignment: .leading, spacing: 12) {
                     R2TileHeader(title: "Monthly Plan", symbol: "chart.bar.doc.horizontal.fill") { R2Chevron() }
                     if let plan = snapshot.plan {
-                        Text(paceSentence(plan))
+                        Text(snapshot.r5PaceSentence(for: plan))
                             .font(.title3.weight(.semibold))
                         ExplorationStatusLabel(status: plan.status)
                             .font(.subheadline.weight(.semibold))
@@ -51,19 +51,22 @@ struct R5PlanPaceTile: View {
         }
         .buttonStyle(.plain)
     }
+}
 
-    private func paceSentence(_ plan: ExplorationPlanSummary) -> LocalizedStringKey {
+extension ExplorationHomeSnapshot {
+    /// Slate's one-sentence read of the plan's pace ("At this pace you'll go €50.07 over plan.").
+    func r5PaceSentence(for plan: ExplorationPlanSummary) -> LocalizedStringKey {
         // A-09: no pace estimate during the first 3 days of the month.
-        guard snapshot.dayOfMonth > 3 else {
-            return "\(plan.totalRemaining, format: .currency(code: code)) left to spend this month."
+        guard dayOfMonth > 3 else {
+            return "\(plan.totalRemaining, format: .currency(code: currencyCode)) left to spend this month."
         }
         switch plan.status {
         case .onTrack:
-            return "You're on track, with \(plan.totalRemaining, format: .currency(code: code)) left to spend."
+            return "You're on track, with \(plan.totalRemaining, format: .currency(code: currencyCode)) left to spend."
         case .atRisk:
-            return "At this pace you'll go \(plan.totalProjected - plan.totalPlanned, format: .currency(code: code)) over plan."
+            return "At this pace you'll go \(plan.totalProjected - plan.totalPlanned, format: .currency(code: currencyCode)) over plan."
         case .over:
-            return "You're already \(plan.totalSpent - plan.totalPlanned, format: .currency(code: code)) over plan."
+            return "You're already \(plan.totalSpent - plan.totalPlanned, format: .currency(code: currencyCode)) over plan."
         }
     }
 }
