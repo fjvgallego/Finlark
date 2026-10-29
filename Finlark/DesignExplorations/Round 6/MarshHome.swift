@@ -27,7 +27,6 @@ struct MarshHomeView: View {
     @State private var model: ExplorationHomeModel
     @State private var debtors = R6Debtor.sample
     @State private var selection: Panel = .month
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(snapshot: ExplorationHomeSnapshot = .sample) {
         _model = State(initialValue: ExplorationHomeModel(snapshot: snapshot))
@@ -60,12 +59,11 @@ struct MarshHomeView: View {
         R2Tile(padding: 18) {
             VStack(alignment: .leading, spacing: 12) {
                 R5BalanceHeader(snapshot: snapshot)
-                Picker("Show", selection: $selection.animation(reduceMotion ? nil : .snappy)) {
-                    ForEach(Panel.allCases, id: \.self) { panel in
-                        Text(panel.title).tag(panel)
-                    }
-                }
-                .pickerStyle(.segmented)
+                R6SegmentedControl(
+                    title: "Show",
+                    options: Panel.allCases.map { (value: $0, label: $0.title) },
+                    selection: $selection
+                )
 
                 switch selection {
                 case .month:

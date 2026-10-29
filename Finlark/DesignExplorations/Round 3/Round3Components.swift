@@ -732,13 +732,13 @@ struct R3PendingSection: View {
                         Label("Skip", systemImage: "forward.end")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.glass)
+                    .explorationButton(.secondary)
                     .accessibilityLabel(Text("Skip \(item.note)"))
                     Button { model.confirm(item) } label: {
                         Label("Confirm", systemImage: "checkmark")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.glassProminent)
+                    .explorationButton(.primary)
                     .accessibilityLabel(Text("Confirm \(item.note)"))
                 }
             }

@@ -386,6 +386,70 @@ extension EnvironmentValues {
     @Entry var explorationIconStyle: ExplorationIconStyle = .solid
 }
 
+/// How buttons are drawn: the system glass styles, or Liquid Glass tinted with a brand color in a
+/// rounded rectangle with rounded type, so buttons stop looking like stock iOS.
+enum ExplorationButtonLook {
+    case system
+    case brandGlass(Color)
+}
+
+enum ExplorationButtonRole {
+    case primary
+    case secondary
+}
+
+extension EnvironmentValues {
+    @Entry var explorationButtonLook: ExplorationButtonLook = .system
+}
+
+extension View {
+    /// Applies the button look from the environment for a primary or secondary action.
+    func explorationButton(_ role: ExplorationButtonRole) -> some View {
+        modifier(ExplorationButtonModifier(role: role))
+    }
+}
+
+private struct ExplorationButtonModifier: ViewModifier {
+    let role: ExplorationButtonRole
+    @Environment(\.explorationButtonLook) private var look
+
+    func body(content: Content) -> some View {
+        switch (look, role) {
+        case (.system, .primary):
+            content.buttonStyle(.glassProminent)
+        case (.system, .secondary):
+            content.buttonStyle(.glass)
+        case (.brandGlass(let tint), _):
+            content.buttonStyle(ExplorationBrandGlassButtonStyle(tint: tint, isPrimary: role == .primary))
+        }
+    }
+}
+
+/// Interactive Liquid Glass, tinted with the brand color for primary actions and lightly for
+/// secondary ones, in a continuous rounded rectangle.
+struct ExplorationBrandGlassButtonStyle: ButtonStyle {
+    let tint: Color
+    let isPrimary: Bool
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.semibold))
+            .fontDesign(.rounded)
+            .foregroundStyle(isPrimary ? Color.white : tint)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .frame(minHeight: 44)
+            .glassEffect(
+                isPrimary ? .regular.tint(tint).interactive() : .regular.tint(tint.opacity(0.12)).interactive(),
+                in: .rect(cornerRadius: 14, style: .continuous)
+            )
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.97 : 1)
+            .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: configuration.isPressed)
+    }
+}
+
 struct ExplorationCategoryIcon: View {
     let category: ExplorationCategory
     @ScaledMetric private var size: CGFloat = 36

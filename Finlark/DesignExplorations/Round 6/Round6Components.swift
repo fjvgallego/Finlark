@@ -229,7 +229,7 @@ private struct R6SettlePopover: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 4)
             }
-            .buttonStyle(.glassProminent)
+            .explorationButton(.primary)
 
             Text("Records a repayment for each open share, dated today.")
                 .font(.caption)
@@ -331,6 +331,65 @@ struct R6PlanTile: View {
         R3PlanFigure(title: "Projected", value: plan.totalProjected, code: code, swatch: .projected(plan.status.tint))
         Spacer(minLength: 8)
         R3PlanFigure(title: "Planned", value: plan.totalPlanned, code: code, swatch: .planned)
+    }
+}
+
+// MARK: - Segmented control
+
+/// A two-or-more option switch. With the system button look it's a segmented Picker; with the brand
+/// look, the selected option is a brand-colored rounded pill that slides between options.
+struct R6SegmentedControl<Value: Hashable>: View {
+    let title: LocalizedStringKey
+    let options: [(value: Value, label: LocalizedStringKey)]
+    @Binding var selection: Value
+
+    @Environment(\.explorationButtonLook) private var look
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var namespace
+
+    var body: some View {
+        switch look {
+        case .system:
+            Picker(title, selection: $selection.animation(reduceMotion ? nil : .snappy)) {
+                ForEach(options.indices, id: \.self) { index in
+                    Text(options[index].label).tag(options[index].value)
+                }
+            }
+            .pickerStyle(.segmented)
+        case .brandGlass(let tint):
+            HStack(spacing: 4) {
+                ForEach(options.indices, id: \.self) { index in
+                    let option = options[index]
+                    let isSelected = option.value == selection
+                    Button {
+                        withAnimation(reduceMotion ? nil : .snappy) {
+                            selection = option.value
+                        }
+                    } label: {
+                        Text(option.label)
+                            .font(.subheadline.weight(.semibold))
+                            .fontDesign(.rounded)
+                            .foregroundStyle(isSelected ? Color.white : Color.primary)
+                            .frame(maxWidth: .infinity, minHeight: 34)
+                            .background {
+                                if isSelected {
+                                    RoundedRectangle(cornerRadius: 11, style: .continuous)
+                                        .fill(tint.gradient)
+                                        .matchedGeometryEffect(id: "selection", in: namespace)
+                                }
+                            }
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                }
+            }
+            .padding(4)
+            // A plain track rather than glass, since the control already sits on a glass tile.
+            .background(tint.opacity(0.1), in: .rect(cornerRadius: 15, style: .continuous))
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(Text(title))
+        }
     }
 }
 
