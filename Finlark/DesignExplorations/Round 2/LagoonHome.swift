@@ -51,7 +51,7 @@ struct LagoonHomeView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        R2TabShell(model: model) {
             ScrollViewReader { proxy in
                 ScrollView {
                     GlassEffectContainer(spacing: r2GlassBlendSpacing) {
@@ -77,9 +77,7 @@ struct LagoonHomeView: View {
             }
             .background(R2Backdrop())
             .animation(reduceMotion ? nil : .default, value: model.pendingItems.map(\.id))
-            .r2FloatingAddButton { model.addingType = .expense }
             .r2CompactTitle()
-            .explorationScaffold(model)
         }
     }
 
@@ -240,7 +238,7 @@ struct LagoonHomeView: View {
         R2Tile {
             VStack(alignment: .leading, spacing: 14) {
                 R2TileHeader(title: "Recent", symbol: "clock.fill") {
-                    NavigationLink("History", value: ExplorationDestination.history)
+                    R2Link(destination: .history) { Text("See all") }
                         .font(.subheadline.weight(.semibold))
                 }
                 ForEach(snapshot.recentTransactions) { transaction in

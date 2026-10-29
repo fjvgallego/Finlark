@@ -4,7 +4,8 @@
 //
 //  FIN-9 Round 2: building blocks shared by the Round 2 Home explorations. They combine the traits the
 //  owner picked from Round 1: Glasshouse's glass tiles and backdrop, Mosaic's bento tiles, Carousel's
-//  slider and Quiet's compact title.
+//  slider and Quiet's compact title. Every variation sits in the same tab shell, picked in Round 3:
+//  a native tab bar whose bottom accessory holds quick add, plus the separate search tab.
 //
 
 #if DEBUG
@@ -192,39 +193,273 @@ struct R2PageDots: View {
     }
 }
 
-/// The floating glass quick-add button (Glasshouse). It reserves its own space at the bottom of the screen,
-/// so content scrolls underneath it but is never covered at the end.
-private struct R2FloatingAddButton: ViewModifier {
-    let action: () -> Void
-    @ScaledMetric private var size: CGFloat = 60
-
-    func body(content: Content) -> some View {
-        content.safeAreaInset(edge: .bottom, alignment: .trailing) {
-            Button(action: action) {
-                Image(systemName: "plus")
-                    .font(.title2.weight(.semibold))
-                    .frame(width: size, height: size)
-            }
-            .buttonStyle(.glassProminent)
-            .buttonBorderShape(.circle)
-            .accessibilityLabel(Text("Add transaction"))
-            .padding(.trailing, 20)
-            .padding(.bottom, 4)
-        }
-    }
-}
-
 extension View {
-    func r2FloatingAddButton(action: @escaping () -> Void) -> some View {
-        modifier(R2FloatingAddButton(action: action))
-    }
-
     /// Quiet's compact title: "Home" stays small and inline instead of taking a large-title row.
     func r2CompactTitle() -> some View {
         navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+// MARK: - Tab shell
+
+/// The native tab bar shared by every Round 2 variation: Home, Transactions, Settings and the separate
+/// search tab. Quick add (HOM-007, TRX-001) lives in the bottom accessory above the tab bar on Home and
+/// Transactions, with Add expense first and an Income shortcut. When scrolling down, the tab bar
+/// minimizes and the accessory moves inline next to it.
+struct R2TabShell<Home: View>: View {
+    private enum AppTab: Hashable {
+        case home
+        case transactions
+        case settings
+        case search
+    }
+
+    let model: ExplorationHomeModel
+    private let home: Home
+
+    @State private var selection: AppTab = .home
+    @State private var router = R2TabRouter(tabDestinations: [.history])
+
+    init(model: ExplorationHomeModel, @ViewBuilder home: () -> Home) {
+        self.model = model
+        self.home = home()
+    }
+
+    var body: some View {
+        @Bindable var model = model
+
+        TabView(selection: $selection) {
+            Tab("Home", systemImage: "house", value: AppTab.home) {
+                NavigationStack {
+                    home
+                        .r2Destinations()
+                }
+            }
+            Tab("Transactions", systemImage: "list.bullet.rectangle", value: AppTab.transactions) {
+                NavigationStack {
+                    R2TransactionsScreen(model: model, title: "Transactions")
+                        .r2Destinations()
+                }
+            }
+            Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {
+                NavigationStack {
+                    R2SettingsScreen()
+                }
+            }
+            Tab(value: AppTab.search, role: .search) {
+                NavigationStack {
+                    R2TransactionsScreen(model: model, title: "Search", isSearchable: true)
+                        .r2Destinations()
+                }
+            }
+        }
+        .tabBarMinimizeBehavior(.onScrollDown)
+        .tabViewBottomAccessory(isEnabled: selection == .home || selection == .transactions) {
+            R2QuickAddAccessory(model: model)
+        }
+        .environment(router)
+        .onChange(of: router.requested) { _, destination in
+            guard destination != nil else { return }
+            selection = .transactions
+            router.requested = nil
+        }
+        .sheet(item: $model.addingType) { type in
+            ExplorationAddSheet(type: type, currencyCode: model.snapshot.currencyCode)
+        }
+    }
+}
+
+/// Quick add in the tab view's bottom accessory: "Add expense" plus an Income shortcut, or a single
+/// compact button when the accessory sits inline next to the minimized tab bar.
+private struct R2QuickAddAccessory: View {
+    let model: ExplorationHomeModel
+    @Environment(\.tabViewBottomAccessoryPlacement) private var placement
+
+    var body: some View {
+        if placement == .inline {
+            Button {
+                model.addingType = .expense
+            } label: {
+                Label("Add expense", systemImage: "plus")
+            }
+        } else {
+            HStack(spacing: 0) {
+                Button {
+                    model.addingType = .expense
+                } label: {
+                    Label("Add expense", systemImage: "plus.circle.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                Divider()
+                    .padding(.vertical, 8)
+                Button {
+                    model.addingType = .income
+                } label: {
+                    Label("Income", systemImage: "arrow.down.circle")
+                        .frame(maxWidth: .infinity)
+                }
+                .frame(maxWidth: 140)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+}
+
+// MARK: - Routing
+
+/// Lets Home's links switch tabs. Destinations in `tabDestinations` are tabs in the shell, so links to
+/// them set `requested` (the shell switches tab) instead of pushing a screen.
+@Observable
+final class R2TabRouter {
+    let tabDestinations: Set<ExplorationDestination>
+    var requested: ExplorationDestination?
+
+    init(tabDestinations: Set<ExplorationDestination>) {
+        self.tabDestinations = tabDestinations
+    }
+}
+
+/// Pushes the destination, or switches to its tab when the shell has one for it.
+struct R2Link<Label: View>: View {
+    let destination: ExplorationDestination
+    @ViewBuilder let label: Label
+
+    @Environment(R2TabRouter.self) private var router: R2TabRouter?
+
+    var body: some View {
+        if let router, router.tabDestinations.contains(destination) {
+            Button {
+                router.requested = destination
+            } label: {
+                label
+            }
+        } else {
+            NavigationLink(value: destination) {
+                label
+            }
+        }
+    }
+}
+
+extension View {
+    /// Placeholder pushes for destinations that aren't tabs. Apply inside each tab's NavigationStack.
+    func r2Destinations() -> some View {
+        navigationDestination(for: ExplorationDestination.self) { destination in
+            ExplorationPlaceholderScreen(destination: destination)
+        }
+    }
+}
+
+// MARK: - Transactions tab (mock of TRX-005)
+
+/// A light mock of the Transactions screen so the tab bar feels real. Also backs the search tab.
+struct R2TransactionsScreen: View {
+    let model: ExplorationHomeModel
+    let title: LocalizedStringKey
+    var isSearchable = false
+
+    @State private var searchText = ""
+
+    private var code: String { model.snapshot.currencyCode }
+
+    private var days: [(day: Date, transactions: [ExplorationTransaction])] {
+        let matching = model.snapshot.recentTransactions.filter { transaction in
+            searchText.isEmpty || (transaction.note ?? "").localizedStandardContains(searchText)
+        }
+        let grouped = Dictionary(grouping: matching) { Calendar.current.startOfDay(for: $0.date) }
+        return grouped.keys.sorted(by: >).map { (day: $0, transactions: grouped[$0] ?? []) }
+    }
+
+    var body: some View {
+        List {
+            Section {
+                LabeledContent("Income") {
+                    Text(model.snapshot.monthIncome, format: .currency(code: code))
+                }
+                LabeledContent("Spending") {
+                    Text(model.snapshot.monthSpending, format: .currency(code: code))
+                }
+            } header: {
+                Text(Date.now, format: .dateTime.month(.wide).year())
+            }
+            .monospacedDigit()
+
+            ForEach(days, id: \.day) { day in
+                Section {
+                    ForEach(day.transactions) { transaction in
+                        ExplorationTransactionRow(transaction: transaction, currencyCode: code)
+                    }
+                } header: {
+                    Text(day.day, format: .dateTime.weekday(.wide).day().month(.wide))
+                }
+            }
+        }
+        .overlay {
+            if days.isEmpty && !searchText.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .modifier(R2OptionalSearch(isEnabled: isSearchable, text: $searchText))
+    }
+}
+
+private struct R2OptionalSearch: ViewModifier {
+    let isEnabled: Bool
+    @Binding var text: String
+
+    func body(content: Content) -> some View {
+        if isEnabled {
+            content.searchable(text: $text, prompt: Text("Search notes"))
+        } else {
+            content
+        }
+    }
+}
+
+// MARK: - Settings tab (mock of SET-001)
+
+struct R2SettingsScreen: View {
+    @State private var recurringNotifications = true
+    @State private var iouNotifications = true
+    @State private var appLock = false
+
+    var body: some View {
+        Form {
+            Section("Account") {
+                LabeledContent("Name", value: "Main account")
+                LabeledContent("Starting balance") {
+                    Text(Decimal(1000), format: .currency(code: "EUR"))
+                }
+                LabeledContent("Home currency", value: "EUR")
+            }
+            Section {
+                Label("Categories", systemImage: "square.grid.2x2")
+                Label("Recurring", systemImage: "repeat")
+            }
+            Section("Notifications") {
+                Toggle("Recurring due", isOn: $recurringNotifications)
+                Toggle("IOU reminders", isOn: $iouNotifications)
+            }
+            Section("Security") {
+                Toggle("App lock", isOn: $appLock)
+            }
+            Section("iCloud") {
+                LabeledContent("Sync", value: String(localized: "Up to date"))
+            }
+            Section {
+                Button("Delete all data", role: .destructive) {}
+            }
+        }
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - Figures
 
 /// An amount with a caption above it, used by the month figures in several variations.
 struct R2Figure: View {

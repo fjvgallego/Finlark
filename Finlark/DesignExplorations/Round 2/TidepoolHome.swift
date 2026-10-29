@@ -44,7 +44,7 @@ struct TidepoolHomeView: View {
     private var code: String { snapshot.currencyCode }
 
     var body: some View {
-        NavigationStack {
+        R2TabShell(model: model) {
             ScrollView {
                 GlassEffectContainer(spacing: r2GlassBlendSpacing) {
                     VStack(spacing: r2TileSpacing) {
@@ -61,9 +61,7 @@ struct TidepoolHomeView: View {
             }
             .background(R2Backdrop())
             .animation(reduceMotion ? nil : .default, value: model.pendingItems.map(\.id))
-            .r2FloatingAddButton { model.addingType = .expense }
             .r2CompactTitle()
-            .explorationScaffold(model)
         }
     }
 
@@ -265,7 +263,7 @@ struct TidepoolHomeView: View {
         R2Tile {
             VStack(alignment: .leading, spacing: 14) {
                 R2TileHeader(title: "Recent", symbol: "clock.fill") {
-                    NavigationLink("History", value: ExplorationDestination.history)
+                    R2Link(destination: .history) { Text("See all") }
                         .font(.subheadline.weight(.semibold))
                 }
                 ForEach(snapshot.recentTransactions) { transaction in

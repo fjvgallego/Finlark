@@ -36,7 +36,7 @@ struct HaloHomeView: View {
     private var code: String { snapshot.currencyCode }
 
     var body: some View {
-        NavigationStack {
+        R2TabShell(model: model) {
             ScrollView {
                 GlassEffectContainer(spacing: r2GlassBlendSpacing) {
                     VStack(alignment: .leading, spacing: r2TileSpacing) {
@@ -59,7 +59,6 @@ struct HaloHomeView: View {
             }
             .background(R2Backdrop())
             .animation(reduceMotion ? nil : .default, value: model.pendingItems.map(\.id))
-            .r2FloatingAddButton { model.addingType = .expense }
             .r2CompactTitle()
             .toolbar {
                 // The balance replaces the visible title (HOM-001). "Home" stays the title for the back button.
@@ -76,7 +75,6 @@ struct HaloHomeView: View {
                     .accessibilityAddTraits(.isHeader)
                 }
             }
-            .explorationScaffold(model)
         }
     }
 
@@ -246,7 +244,7 @@ struct HaloHomeView: View {
         R2Tile {
             VStack(alignment: .leading, spacing: 14) {
                 R2TileHeader(title: "Recent", symbol: "clock.fill") {
-                    NavigationLink("History", value: ExplorationDestination.history)
+                    R2Link(destination: .history) { Text("See all") }
                         .font(.subheadline.weight(.semibold))
                 }
                 ForEach(snapshot.recentTransactions) { transaction in

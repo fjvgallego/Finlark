@@ -4,7 +4,7 @@
 //
 //  FIN-9 Round 2 "Prism": the most direct combination of Round 1 favorites. Glass bento tiles (balance
 //  across the top, plan and owed side by side), a month slider that pages from the figures to the chart,
-//  a compact title and a floating glass add button.
+//  and a compact title.
 //
 
 #if DEBUG
@@ -31,7 +31,7 @@ struct PrismHomeView: View {
     private var code: String { snapshot.currencyCode }
 
     var body: some View {
-        NavigationStack {
+        R2TabShell(model: model) {
             ScrollView {
                 GlassEffectContainer(spacing: r2GlassBlendSpacing) {
                     VStack(spacing: r2TileSpacing) {
@@ -54,9 +54,7 @@ struct PrismHomeView: View {
             }
             .background(R2Backdrop())
             .animation(reduceMotion ? nil : .default, value: model.pendingItems.map(\.id))
-            .r2FloatingAddButton { model.addingType = .expense }
             .r2CompactTitle()
-            .explorationScaffold(model)
         }
     }
 
@@ -214,7 +212,7 @@ struct PrismHomeView: View {
         R2Tile {
             VStack(alignment: .leading, spacing: 14) {
                 R2TileHeader(title: "Recent", symbol: "clock.fill") {
-                    NavigationLink("History", value: ExplorationDestination.history)
+                    R2Link(destination: .history) { Text("See all") }
                         .font(.subheadline.weight(.semibold))
                 }
                 ForEach(snapshot.recentTransactions) { transaction in

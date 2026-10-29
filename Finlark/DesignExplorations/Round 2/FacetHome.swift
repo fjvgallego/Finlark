@@ -25,7 +25,7 @@ struct FacetHomeView: View {
     private var code: String { snapshot.currencyCode }
 
     var body: some View {
-        NavigationStack {
+        R2TabShell(model: model) {
             ScrollView {
                 GlassEffectContainer(spacing: r2GlassBlendSpacing) {
                     VStack(alignment: .leading, spacing: r2TileSpacing) {
@@ -38,7 +38,7 @@ struct FacetHomeView: View {
                             }
                         }
                         sectionHeader("Recent") {
-                            NavigationLink("History", value: ExplorationDestination.history)
+                            R2Link(destination: .history) { Text("See all") }
                                 .font(.subheadline.weight(.semibold))
                         }
                         recentChips
@@ -49,9 +49,7 @@ struct FacetHomeView: View {
             }
             .background(R2Backdrop())
             .animation(reduceMotion ? nil : .default, value: model.pendingItems.map(\.id))
-            .r2FloatingAddButton { model.addingType = .expense }
             .r2CompactTitle()
-            .explorationScaffold(model)
         }
     }
 
@@ -233,7 +231,7 @@ struct FacetHomeView: View {
                         FacetChip(transaction: transaction, code: code)
                             .frame(width: chipWidth)
                     }
-                    NavigationLink(value: ExplorationDestination.history) {
+                    R2Link(destination: .history) {
                         Label("See all", systemImage: "arrow.right")
                             .labelStyle(.iconOnly)
                             .font(.headline)
@@ -241,7 +239,7 @@ struct FacetHomeView: View {
                             .glassEffect(.regular.interactive(), in: .circle)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(Text("See all in History"))
+                    .accessibilityLabel(Text("See all transactions"))
                 }
                 .fixedSize(horizontal: false, vertical: true)
                 .scrollTargetLayout()
