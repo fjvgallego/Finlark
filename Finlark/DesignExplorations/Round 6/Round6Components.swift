@@ -184,11 +184,14 @@ struct R6OwedBar: View {
     }
 }
 
-/// What a person owes, share by share, with one confirming action: Settle all (SPL-008).
+/// What a person owes, share by share, with Settle all (SPL-008). Settling asks for confirmation
+/// first, since recording repayments by mistake is easy to do and annoying to undo.
 private struct R6SettlePopover: View {
     let debtor: R6Debtor
     let code: String
     let onSettle: () -> Void
+
+    @State private var isConfirming = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -223,13 +226,21 @@ private struct R6SettlePopover: View {
                 .accessibilityElement(children: .combine)
             }
 
-            Button(action: onSettle) {
+            Button {
+                isConfirming = true
+            } label: {
                 Label("Settle all · \(debtor.total, format: .currency(code: code))", systemImage: "checkmark.circle.fill")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 4)
             }
             .explorationButton(.primary)
+            .alert(Text("Settle all with \(debtor.name)?"), isPresented: $isConfirming) {
+                Button("Cancel", role: .cancel) {}
+                Button("Settle all", action: onSettle)
+            } message: {
+                Text("This records \(debtor.total, format: .currency(code: code)) in repayments for \(debtor.shares.count) shares, dated today.")
+            }
 
             Text("Records a repayment for each open share, dated today.")
                 .font(.caption)
