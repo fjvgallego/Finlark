@@ -253,47 +253,44 @@ extension ExplorationHomeSnapshot {
     var r3DaysLeft: Int { daysInMonth - dayOfMonth }
 }
 
-/// Horizontal bars with the category name on the left and the amount at the end of each bar,
-/// so no legend is needed.
+/// Horizontal bars on a shared scale, each with its category name and amount written above it,
+/// so no legend is needed. Labels are plain text rather than chart annotations, which didn't render.
 struct R3LabeledBars: View {
     let spending: [ExplorationCategorySpending]
     let code: String
 
-    @ScaledMetric(relativeTo: .subheadline) private var rowHeight: CGFloat = 34
+    @ScaledMetric(relativeTo: .caption) private var barHeight: CGFloat = 8
 
     var body: some View {
         let maxValue = spending.map(\.amount.plotValue).max() ?? 0
 
-        Chart(spending) { item in
-            BarMark(
-                x: .value("Amount", item.amount.plotValue),
-                y: .value("Category", item.id)
-            )
-            .foregroundStyle(item.category.color)
-            .cornerRadius(5)
-            .annotation(position: .trailing, spacing: 6) {
-                Text(item.amount, format: .currency(code: code))
-                    .font(.caption.weight(.semibold))
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-            }
-            .accessibilityLabel(Text(item.category.name))
-            .accessibilityValue(Text(item.amount, format: .currency(code: code)))
-        }
-        // Headroom on the right so the amount labels fit next to the longest bar.
-        .chartXScale(domain: 0...max(maxValue * 1.5, 1))
-        .chartXAxis(.hidden)
-        .chartYAxis {
-            AxisMarks(position: .leading) { value in
-                AxisValueLabel {
-                    if let id = value.as(String.self), let item = spending.first(where: { $0.id == id }) {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(spending) { item in
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(alignment: .firstTextBaseline) {
                         Text(item.category.name)
-                            .font(.subheadline)
+                        Spacer(minLength: 8)
+                        Text(item.amount, format: .currency(code: code))
+                            .fontWeight(.semibold)
+                            .monospacedDigit()
                     }
+                    .font(.subheadline)
+
+                    Chart {
+                        BarMark(xStart: .value("Start", 0), xEnd: .value("Amount", item.amount.plotValue))
+                            .foregroundStyle(item.category.color)
+                            .cornerRadius(barHeight / 2)
+                    }
+                    .chartXScale(domain: 0...max(maxValue, 1))
+                    .chartXAxis(.hidden)
+                    .chartYAxis(.hidden)
+                    .frame(height: barHeight)
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text(item.category.name))
+                .accessibilityValue(Text(item.amount, format: .currency(code: code)))
             }
         }
-        .frame(height: rowHeight * CGFloat(spending.count))
     }
 }
 
