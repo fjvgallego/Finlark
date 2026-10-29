@@ -1,0 +1,249 @@
+//
+//  Round2Components.swift
+//  Finlark
+//
+//  FIN-9 Round 2: building blocks shared by the Round 2 Home explorations. They combine the traits the
+//  owner picked from Round 1: Glasshouse's glass tiles and backdrop, Mosaic's bento tiles, Carousel's
+//  slider and Quiet's compact title.
+//
+
+#if DEBUG
+import SwiftUI
+
+/// Where content tiles get their surface: glass (Glasshouse) or solid grouped backgrounds, which keeps
+/// Liquid Glass on the controls layer only.
+enum R2Surface {
+    case glass
+    case solid
+}
+
+extension EnvironmentValues {
+    @Entry var r2Surface: R2Surface = .glass
+}
+
+/// The gap between tiles. Glass containers use a smaller spacing so neighboring tiles don't blend together.
+let r2TileSpacing: CGFloat = 12
+let r2GlassBlendSpacing: CGFloat = 4
+
+struct R2Backdrop: View {
+    @Environment(\.r2Surface) private var surface
+
+    var body: some View {
+        Group {
+            switch surface {
+            case .glass:
+                LinearGradient(
+                    colors: [Color.indigo.opacity(0.28), Color.teal.opacity(0.16), Color(.systemBackground)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .solid:
+                Color(.systemGroupedBackground)
+            }
+        }
+        .ignoresSafeArea()
+    }
+}
+
+/// A bento tile. Fills the height of its grid row so tiles side by side line up.
+struct R2Tile<Content: View>: View {
+    var padding: CGFloat = 16
+    @ViewBuilder let content: Content
+
+    @Environment(\.r2Surface) private var surface
+
+    var body: some View {
+        let laidOut = content
+            .padding(padding)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+
+        switch surface {
+        case .glass:
+            laidOut.glassEffect(.regular, in: .rect(cornerRadius: 24))
+        case .solid:
+            laidOut.background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 24))
+        }
+    }
+}
+
+/// A tile's small uppercase heading, with an optional trailing accessory.
+struct R2TileHeader<Trailing: View>: View {
+    let title: LocalizedStringKey
+    let symbol: String
+    @ViewBuilder var trailing: Trailing
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Label(title, systemImage: symbol)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .accessibilityAddTraits(.isHeader)
+            Spacer(minLength: 4)
+            trailing
+        }
+    }
+}
+
+extension R2TileHeader where Trailing == EmptyView {
+    init(title: LocalizedStringKey, symbol: String) {
+        self.init(title: title, symbol: symbol) { EmptyView() }
+    }
+}
+
+/// A chevron that marks a tile as tappable.
+struct R2Chevron: View {
+    var body: some View {
+        Image(systemName: "chevron.right")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.tertiary)
+            .accessibilityHidden(true)
+    }
+}
+
+/// A horizontal, snapping slider of full-width pages with a glass page indicator (Carousel).
+/// Pages share the height of the tallest one. At accessibility sizes the pages stack vertically instead.
+struct R2Slider<Item: Identifiable, Page: View>: View {
+    private let items: [Item]
+    private let spacing: CGFloat
+    private let margin: CGFloat
+    private let indicatorOnGlass: Bool
+    private let peeksNextPage: Bool
+    private let page: (Item) -> Page
+
+    @State private var currentID: Item.ID?
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// - Parameters:
+    ///   - margin: horizontal inset around the pages. A non-zero margin lets the next page peek in.
+    ///   - indicatorOnGlass: false when the slider already sits inside a glass tile, to avoid glass on glass.
+    ///   - peeksNextPage: narrows each page so the edge of the next one shows, hinting that it scrolls.
+    init(
+        _ items: [Item],
+        spacing: CGFloat = r2TileSpacing,
+        margin: CGFloat = 16,
+        indicatorOnGlass: Bool = true,
+        peeksNextPage: Bool = false,
+        @ViewBuilder page: @escaping (Item) -> Page
+    ) {
+        self.items = items
+        self.spacing = spacing
+        self.margin = margin
+        self.indicatorOnGlass = indicatorOnGlass
+        self.peeksNextPage = peeksNextPage
+        self.page = page
+    }
+
+    var body: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(spacing: spacing) {
+                ForEach(items) { item in
+                    page(item)
+                }
+            }
+            .padding(.horizontal, margin)
+        } else {
+            VStack(spacing: 8) {
+                ScrollView(.horizontal) {
+                    HStack(alignment: .top, spacing: spacing) {
+                        ForEach(items) { item in
+                            page(item)
+                                .containerRelativeFrame(.horizontal, count: peeksNextPage ? 8 : 1, span: peeksNextPage ? 7 : 1, spacing: spacing)
+                        }
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .scrollTargetLayout()
+                }
+                .scrollTargetBehavior(.viewAligned)
+                .scrollPosition(id: $currentID)
+                .scrollIndicators(.hidden)
+                .scrollClipDisabled()
+                .contentMargins(.horizontal, margin, for: .scrollContent)
+
+                if items.count > 1 {
+                    R2PageDots(count: items.count, index: currentIndex, onGlass: indicatorOnGlass)
+                }
+            }
+        }
+    }
+
+    private var currentIndex: Int {
+        items.firstIndex { $0.id == currentID } ?? 0
+    }
+}
+
+struct R2PageDots: View {
+    let count: Int
+    let index: Int
+    var onGlass = true
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(0..<count, id: \.self) { position in
+                Capsule()
+                    .fill(position == index ? AnyShapeStyle(.primary) : AnyShapeStyle(.tertiary))
+                    .frame(width: position == index ? 16 : 6, height: 6)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .glassEffect(onGlass ? .regular : .identity, in: .capsule)
+        .accessibilityHidden(true) // VoiceOver reaches every page by swiping.
+    }
+}
+
+/// The floating glass quick-add button (Glasshouse). It reserves its own space at the bottom of the screen,
+/// so content scrolls underneath it but is never covered at the end.
+private struct R2FloatingAddButton: ViewModifier {
+    let action: () -> Void
+    @ScaledMetric private var size: CGFloat = 60
+
+    func body(content: Content) -> some View {
+        content.safeAreaInset(edge: .bottom, alignment: .trailing) {
+            Button(action: action) {
+                Image(systemName: "plus")
+                    .font(.title2.weight(.semibold))
+                    .frame(width: size, height: size)
+            }
+            .buttonStyle(.glassProminent)
+            .buttonBorderShape(.circle)
+            .accessibilityLabel(Text("Add transaction"))
+            .padding(.trailing, 20)
+            .padding(.bottom, 4)
+        }
+    }
+}
+
+extension View {
+    func r2FloatingAddButton(action: @escaping () -> Void) -> some View {
+        modifier(R2FloatingAddButton(action: action))
+    }
+
+    /// Quiet's compact title: "Home" stays small and inline instead of taking a large-title row.
+    func r2CompactTitle() -> some View {
+        navigationTitle("Home")
+            .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// An amount with a caption above it, used by the month figures in several variations.
+struct R2Figure: View {
+    let title: LocalizedStringKey
+    let value: Decimal
+    let code: String
+    var signed = false
+    var font: Font = .headline
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value, format: .currency(code: code).sign(strategy: signed ? .always() : .automatic))
+                .font(font)
+                .monospacedDigit()
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+#endif
