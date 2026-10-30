@@ -157,7 +157,7 @@ private struct PuffinCategorySearch: View {
 
 /// Items as rows and people as columns; a tap toggles who had what. At accessibility sizes it falls
 /// back to the list of items with people chips.
-private struct PuffinItemTable: View {
+struct PuffinItemTable: View {
     @Bindable var draft: AEDraft
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
