@@ -382,7 +382,11 @@ struct HYEmptyView: View {
                 ContentUnavailableView {
                     Label("No matches", systemImage: "line.3.horizontal.decrease.circle")
                 } description: {
-                    Text("Nothing this month matches these filters.")
+                    if store.month == nil {
+                        Text("Nothing matches these filters.")
+                    } else {
+                        Text("Nothing this month matches these filters.")
+                    }
                 } actions: {
                     Button("Clear filters") { store.clearFilters() }
                         .buttonStyle(.glass)

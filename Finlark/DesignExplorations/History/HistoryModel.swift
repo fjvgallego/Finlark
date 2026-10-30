@@ -53,6 +53,9 @@ struct HYTotals {
     var income: Decimal = 0
     var spending: Decimal = 0
 
+    /// What's left of income after spending, as on Home.
+    var difference: Decimal { income - spending }
+
     init(_ records: some Sequence<TDRecord>) {
         for record in records {
             income += record.income
