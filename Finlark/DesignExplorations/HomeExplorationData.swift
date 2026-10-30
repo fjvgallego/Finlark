@@ -265,9 +265,12 @@ final class ExplorationHomeModel {
     let snapshot: ExplorationHomeSnapshot
     private(set) var pendingItems: [ExplorationPendingItem]
     var addingType: ExplorationTransactionType?
+    /// The add screen to present instead of the stand-in, so the Add & edit explorations open from Home.
+    @ObservationIgnored let addEditor: ((ExplorationTransactionType) -> AnyView)?
 
-    init(snapshot: ExplorationHomeSnapshot) {
+    init(snapshot: ExplorationHomeSnapshot, addEditor: ((ExplorationTransactionType) -> AnyView)? = nil) {
         self.snapshot = snapshot
+        self.addEditor = addEditor
         pendingItems = snapshot.pendingItems
     }
 

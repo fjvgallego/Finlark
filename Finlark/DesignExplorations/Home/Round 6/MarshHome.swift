@@ -28,8 +28,15 @@ struct MarshHomeView: View {
     @State private var debtors = R6Debtor.sample
     @State private var selection: Panel = .month
 
-    init(snapshot: ExplorationHomeSnapshot = .sample) {
-        _model = State(initialValue: ExplorationHomeModel(snapshot: snapshot))
+    /// `addingType` opens the add screen right away, and `addEditor` replaces the stand-in add screen.
+    init(
+        snapshot: ExplorationHomeSnapshot = .sample,
+        addingType: ExplorationTransactionType? = nil,
+        addEditor: ((ExplorationTransactionType) -> AnyView)? = nil
+    ) {
+        let model = ExplorationHomeModel(snapshot: snapshot, addEditor: addEditor)
+        model.addingType = addingType
+        _model = State(initialValue: model)
     }
 
     private var snapshot: ExplorationHomeSnapshot { model.snapshot }

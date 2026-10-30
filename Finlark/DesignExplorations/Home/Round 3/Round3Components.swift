@@ -93,7 +93,11 @@ struct R3TabShell<Home: View>: View {
             router.requested = nil
         }
         .sheet(item: $model.addingType) { type in
-            ExplorationAddSheet(type: type, currencyCode: model.snapshot.currencyCode)
+            if let addEditor = model.addEditor {
+                addEditor(type)
+            } else {
+                ExplorationAddSheet(type: type, currencyCode: model.snapshot.currencyCode)
+            }
         }
     }
 }
