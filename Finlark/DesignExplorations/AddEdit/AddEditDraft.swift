@@ -320,6 +320,20 @@ final class AEDraft {
         )
     }
 
+    /// A copy to edit, with what each person has repaid so far (SPL-010). The transaction detail edits
+    /// a copy so Cancel leaves the saved transaction as it was.
+    func copy(repaid: [AEPerson.ID: Decimal]) -> AEDraft {
+        let copy = AEDraft(
+            purpose: .edit, type: type, date: date, categoryID: categoryID, note: note, isSplit: isSplit,
+            splitMode: splitMode, participants: participants, items: items, repaid: repaid,
+            currencyCode: currencyCode
+        )
+        copy.amountText = amountText
+        copy.exactTexts = exactTexts
+        copy.people = people
+        return copy
+    }
+
     var title: LocalizedStringResource {
         purpose == .add ? type.addTitle : type.editTitle
     }

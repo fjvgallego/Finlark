@@ -53,6 +53,7 @@ private struct AEEditorChrome: ViewModifier {
     let title: LocalizedStringKey?
     let showsCancel: Bool
     let showsSave: Bool
+    let onSave: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
 
@@ -68,7 +69,10 @@ private struct AEEditorChrome: ViewModifier {
                 }
                 if showsSave {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Save", systemImage: "checkmark", role: .confirm) { dismiss() }
+                        Button("Save", systemImage: "checkmark", role: .confirm) {
+                            onSave?()
+                            dismiss()
+                        }
                             .disabled(!draft.canSave)
                     }
                 }
@@ -83,9 +87,12 @@ extension View {
         _ draft: AEDraft,
         title: LocalizedStringKey? = nil,
         showsCancel: Bool = true,
-        showsSave: Bool = true
+        showsSave: Bool = true,
+        onSave: (() -> Void)? = nil
     ) -> some View {
-        modifier(AEEditorChrome(draft: draft, title: title, showsCancel: showsCancel, showsSave: showsSave))
+        modifier(AEEditorChrome(
+            draft: draft, title: title, showsCancel: showsCancel, showsSave: showsSave, onSave: onSave
+        ))
     }
 }
 

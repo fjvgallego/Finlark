@@ -13,6 +13,45 @@ import SwiftUI
 
 struct DunlinEditor: View {
     @State private var draft: AEDraft
+    private let onSave: (() -> Void)?
+
+    init(draft: AEDraft, onSave: (() -> Void)? = nil) {
+        _draft = State(initialValue: draft)
+        self.onSave = onSave
+    }
+
+    var body: some View {
+        AE2KestrelShell(draft: draft, onSave: onSave) {
+            DunlinCategoryPicker(draft: draft)
+        } split: {
+            DunlinSplitEditor(draft: draft)
+        }
+    }
+}
+
+/// People chips, the mode, Puffin's By item table, and the shares.
+struct DunlinSplitEditor: View {
+    @Bindable var draft: AEDraft
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            AEPeoplePicker(draft: draft)
+            AESplitModePicker(draft: draft)
+            if draft.splitMode == .byItem {
+                PuffinItemTable(draft: draft)
+            }
+            VStack(spacing: 12) {
+                AEShareRows(draft: draft)
+            }
+            AESplitFooter(draft: draft)
+        }
+    }
+}
+
+/// The four most used categories, and the rest in a bar that expands in place.
+struct DunlinCategoryPicker: View {
+    @Bindable var draft: AEDraft
+
     @State private var isShowingMore = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Namespace private var categoryCells
@@ -20,10 +59,6 @@ struct DunlinEditor: View {
     /// Without Reduce Motion, a pick from the bar flies into the row above while the bar folds.
     private var pickAnimation: Animation? {
         reduceMotion ? nil : .spring(duration: 0.45, bounce: 0.2)
-    }
-
-    init(draft: AEDraft) {
-        _draft = State(initialValue: draft)
     }
 
     /// The selected category first if it isn't among the most used, then the most used.
@@ -42,26 +77,12 @@ struct DunlinEditor: View {
     }
 
     var body: some View {
-        AE2KestrelShell(draft: draft) {
-            VStack(spacing: 10) {
-                AECategoryGrid(
-                    draft: draft, categories: quickCategories, namespace: categoryCells, pickAnimation: pickAnimation
-                )
-                if !moreCategories.isEmpty {
-                    moreSection
-                }
-            }
-        } split: {
-            VStack(alignment: .leading, spacing: 16) {
-                AEPeoplePicker(draft: draft)
-                AESplitModePicker(draft: draft)
-                if draft.splitMode == .byItem {
-                    PuffinItemTable(draft: draft)
-                }
-                VStack(spacing: 12) {
-                    AEShareRows(draft: draft)
-                }
-                AESplitFooter(draft: draft)
+        VStack(spacing: 10) {
+            AECategoryGrid(
+                draft: draft, categories: quickCategories, namespace: categoryCells, pickAnimation: pickAnimation
+            )
+            if !moreCategories.isEmpty {
+                moreSection
             }
         }
     }
