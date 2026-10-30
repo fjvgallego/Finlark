@@ -4,8 +4,8 @@
 //
 //  FIN-9 History, Round 2 "Lyra": Deneb's sections with plain rows. Every month in one scroll; each
 //  month's glass bar pins to the top with its difference, income and spending. The only glass is that
-//  bar and the chips. Picking a month in the title's menu narrows to it and adds a month chip, and
-//  removing the chip goes back to every month.
+//  bar and the chips. Picking a month in the title's menu narrows to it and names it in the title;
+//  All months, in the same menu, goes back. The chips are only for type and categories.
 //
 
 #if DEBUG
@@ -23,7 +23,7 @@ struct LyraHistory: View {
                 alignment: .leading, spacing: 0,
                 pinnedViews: dynamicTypeSize.isAccessibilitySize ? [] : [.sectionHeaders]
             ) {
-                HY2FilterChips(store: store, showsMonth: true)
+                HY2FilterChips(store: store)
                     .padding(.bottom, 8)
 
                 ForEach(store.monthGroups) { group in
