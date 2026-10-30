@@ -168,4 +168,12 @@ private struct BirchPersonSheet: View {
 #Preview("Birch · By item") {
     TDHost(opening: 1) { BirchDetail(record: $0) }
 }
+
+#Preview("Birch · No split") {
+    TDHost(opening: 2) { BirchDetail(record: $0) }
+}
+
+#Preview("Birch · Income") {
+    TDHost(opening: 3) { BirchDetail(record: $0) }
+}
 #endif
