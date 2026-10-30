@@ -157,12 +157,17 @@ final class PPStore {
     // MARK: Repayments (SPL-006, SPL-008)
 
     /// Settle all: a repayment for what's left on every open share, all on the same date (SPL-008).
-    func settleAll(_ id: PPPerson.ID, on date: Date = .now) {
-        guard let index = index(id) else { return }
+    /// Returns the repayments so they can be undone.
+    @discardableResult
+    func settleAll(_ id: PPPerson.ID, on date: Date = .now) -> [PPRepayment] {
+        guard let index = index(id) else { return [] }
+        var recorded: [PPRepayment] = []
         for shareIndex in people[index].shares.indices where people[index].shares[shareIndex].isOpen {
-            let remaining = people[index].shares[shareIndex].remaining
-            people[index].shares[shareIndex].repayments.append(PPRepayment(amount: remaining, date: date))
+            let repayment = PPRepayment(amount: people[index].shares[shareIndex].remaining, date: date)
+            people[index].shares[shareIndex].repayments.append(repayment)
+            recorded.append(repayment)
         }
+        return recorded
     }
 
     /// Marks one share paid, for variants that offer it next to the share (SPL-006). Returns the
