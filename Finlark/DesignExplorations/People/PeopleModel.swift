@@ -165,13 +165,37 @@ final class PPStore {
         }
     }
 
-    /// Marks one share paid, for variants that offer it next to the share (SPL-006).
-    func markPaid(_ shareID: PPShare.ID, of id: PPPerson.ID, on date: Date = .now) {
+    /// Marks one share paid, for variants that offer it next to the share (SPL-006). Returns the
+    /// repayment so it can be undone.
+    @discardableResult
+    func markPaid(_ shareID: PPShare.ID, of id: PPPerson.ID, on date: Date = .now) -> PPRepayment? {
+        guard let share = person(id)?.shares.first(where: { $0.id == shareID }) else { return nil }
+        return record(share.remaining, on: shareID, of: id, on: date)
+    }
+
+    /// Records part or all of what's left on one share (SPL-006, SPL-007). Amounts over what's left
+    /// are refused (A-04).
+    @discardableResult
+    func record(_ amount: Decimal, on shareID: PPShare.ID, of id: PPPerson.ID, on date: Date = .now) -> PPRepayment? {
         guard let index = index(id),
               let shareIndex = people[index].shares.firstIndex(where: { $0.id == shareID }),
-              people[index].shares[shareIndex].isOpen else { return }
-        let remaining = people[index].shares[shareIndex].remaining
-        people[index].shares[shareIndex].repayments.append(PPRepayment(amount: remaining, date: date))
+              amount > 0, amount <= people[index].shares[shareIndex].remaining else { return nil }
+        let repayment = PPRepayment(amount: amount, date: date)
+        people[index].shares[shareIndex].repayments.append(repayment)
+        people[index].shares[shareIndex].repayments.sort { $0.date < $1.date }
+        return repayment
+    }
+
+    /// Deletes a repayment, for Undo right after recording it (SPL-009).
+    func undo(_ repaymentID: PPRepayment.ID, of id: PPPerson.ID) {
+        guard let index = index(id) else { return }
+        for shareIndex in people[index].shares.indices {
+            people[index].shares[shareIndex].repayments.removeAll { $0.id == repaymentID }
+        }
+    }
+
+    func share(_ shareID: PPShare.ID, of id: PPPerson.ID) -> PPShare? {
+        person(id)?.shares.first { $0.id == shareID }
     }
 
     // MARK: Reminder (NTF-003)

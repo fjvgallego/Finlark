@@ -473,13 +473,14 @@ struct PPShareRow: View {
     let share: PPShare
     let code: String
     var showsBar = false
+    var showsIcon = true
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 12) {
-                if !dynamicTypeSize.isAccessibilitySize {
+                if showsIcon, !dynamicTypeSize.isAccessibilitySize {
                     ExplorationCategoryIcon(category: share.category)
                 }
                 VStack(alignment: .leading, spacing: 2) {
