@@ -4,8 +4,8 @@
 //
 //  FIN-9 Add & edit, Round 2 "Dunlin": Puffin, with the rest of the categories in a thin bar that
 //  expands in place, like Home's Owed to you bar, instead of an "All" button and a search sheet.
-//  The four most used stay on top; a category picked from the bar takes the last of those slots and
-//  the bar folds back. The split is Puffin's: people chips, mode, and the By item table.
+//  The four most used stay on top; a category picked from the bar flies up into the first of those
+//  slots (a matched geometry effect) while the bar folds back. The split is Puffin's: people chips, mode, and the By item table.
 //
 
 #if DEBUG
@@ -15,6 +15,12 @@ struct DunlinEditor: View {
     @State private var draft: AEDraft
     @State private var isShowingMore = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var categoryCells
+
+    /// Without Reduce Motion, a pick from the bar flies into the row above while the bar folds.
+    private var pickAnimation: Animation? {
+        reduceMotion ? nil : .spring(duration: 0.45, bounce: 0.2)
+    }
 
     init(draft: AEDraft) {
         _draft = State(initialValue: draft)
@@ -38,7 +44,9 @@ struct DunlinEditor: View {
     var body: some View {
         AE2KestrelShell(draft: draft) {
             VStack(spacing: 10) {
-                AECategoryGrid(draft: draft, categories: quickCategories)
+                AECategoryGrid(
+                    draft: draft, categories: quickCategories, namespace: categoryCells, pickAnimation: pickAnimation
+                )
                 if !moreCategories.isEmpty {
                     moreSection
                 }
@@ -103,8 +111,10 @@ struct DunlinEditor: View {
             if isShowingMore {
                 Divider()
                     .padding(.horizontal, 14)
-                AECategoryGrid(draft: draft, categories: moreCategories) {
-                    withAnimation(reduceMotion ? nil : .snappy) { isShowingMore = false }
+                AECategoryGrid(
+                    draft: draft, categories: moreCategories, namespace: categoryCells, pickAnimation: pickAnimation
+                ) {
+                    isShowingMore = false
                 }
                 .padding(8)
             }

@@ -292,6 +292,10 @@ struct AECategoryGrid: View {
     var columns = 4
     /// A subset to show, for paged grids. All of the draft's type when nil.
     var categories: [ExplorationCategory]?
+    /// Matches each cell with the same category in another grid, so a pick can fly between them.
+    var namespace: Namespace.ID?
+    /// Animates the pick and `onPick` together, which the matched cells need to move.
+    var pickAnimation: Animation?
     var onPick: () -> Void = {}
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -302,8 +306,15 @@ struct AECategoryGrid: View {
             ForEach(categories ?? draft.type.categories) { category in
                 let isSelected = draft.categoryID == category.id
                 Button {
-                    draft.categoryID = category.id
-                    onPick()
+                    if let pickAnimation {
+                        withAnimation(pickAnimation) {
+                            draft.categoryID = category.id
+                            onPick()
+                        }
+                    } else {
+                        draft.categoryID = category.id
+                        onPick()
+                    }
                 } label: {
                     VStack(spacing: 6) {
                         ExplorationCategoryIcon(category: category)
@@ -327,7 +338,21 @@ struct AECategoryGrid: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(isSelected ? .isSelected : [])
+                .modifier(AEMatchedCell(id: category.id, namespace: namespace))
             }
+        }
+    }
+}
+
+private struct AEMatchedCell: ViewModifier {
+    let id: String
+    let namespace: Namespace.ID?
+
+    func body(content: Content) -> some View {
+        if let namespace {
+            content.matchedGeometryEffect(id: id, in: namespace)
+        } else {
+            content
         }
     }
 }
