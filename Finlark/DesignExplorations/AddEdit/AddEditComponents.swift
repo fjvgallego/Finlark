@@ -290,6 +290,8 @@ struct AETypePicker: View {
 struct AECategoryGrid: View {
     @Bindable var draft: AEDraft
     var columns = 4
+    /// A subset to show, for paged grids. All of the draft's type when nil.
+    var categories: [ExplorationCategory]?
     var onPick: () -> Void = {}
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -297,7 +299,7 @@ struct AECategoryGrid: View {
     var body: some View {
         let count = dynamicTypeSize.isAccessibilitySize ? 2 : columns
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: count), spacing: 6) {
-            ForEach(draft.type.categories) { category in
+            ForEach(categories ?? draft.type.categories) { category in
                 let isSelected = draft.categoryID == category.id
                 Button {
                     draft.categoryID = category.id
@@ -846,15 +848,19 @@ struct AESplitFooter: View {
 /// The whole split editor as Form sections: switch, people, mode, items and shares.
 struct AESplitFormSections: View {
     @Bindable var draft: AEDraft
+    /// Off when the screen around it already has the switch.
+    var showsToggle = true
 
     var body: some View {
-        Section {
-            Toggle(isOn: $draft.isSplit) {
-                Label("Split with friends", systemImage: "person.2.fill")
-            }
-        } footer: {
-            if !draft.isSplit {
-                Text("For an expense you paid that others owe you part of.")
+        if showsToggle {
+            Section {
+                Toggle(isOn: $draft.isSplit) {
+                    Label("Split with friends", systemImage: "person.2.fill")
+                }
+            } footer: {
+                if !draft.isSplit {
+                    Text("For an expense you paid that others owe you part of.")
+                }
             }
         }
 
@@ -889,12 +895,13 @@ struct AESplitFormSections: View {
 /// The split editor in its own sheet, for variants that keep the main screen short.
 struct AESplitSheet: View {
     @Bindable var draft: AEDraft
+    var showsToggle = true
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             Form {
-                AESplitFormSections(draft: draft)
+                AESplitFormSections(draft: draft, showsToggle: showsToggle)
             }
             .navigationTitle("Split")
             .navigationBarTitleDisplayMode(.inline)
