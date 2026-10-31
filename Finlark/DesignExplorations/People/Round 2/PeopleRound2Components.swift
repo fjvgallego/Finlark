@@ -428,16 +428,19 @@ struct P2RepaymentSheet: View {
     let store: PPStore
     let payment: P2Payment
     var kind: P2ButtonStyle.Kind = .filled
+    /// The system's blue Liquid Glass for Record instead of the custom look, from People Round 9.
+    var usesSystemGlass = false
 
     @State private var mode: P2Payment.Mode
     @State private var amountText = ""
     @State private var date = Date.now
     @Environment(\.dismiss) private var dismiss
 
-    init(store: PPStore, payment: P2Payment, kind: P2ButtonStyle.Kind = .filled) {
+    init(store: PPStore, payment: P2Payment, kind: P2ButtonStyle.Kind = .filled, usesSystemGlass: Bool = false) {
         self.store = store
         self.payment = payment
         self.kind = kind
+        self.usesSystemGlass = usesSystemGlass
         _mode = State(initialValue: payment.mode)
     }
 
@@ -513,15 +516,16 @@ struct P2RepaymentSheet: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                Button {
-                    store.record(amount, on: payment.shareID, of: payment.personID, on: date)
-                    dismiss()
-                } label: {
-                    Text("Record \(amount, format: .currency(code: store.code))")
-                        .monospacedDigit()
-                        .frame(maxWidth: .infinity)
+                Group {
+                    if usesSystemGlass {
+                        recordButton
+                            .buttonStyle(.glassProminent)
+                            .controlSize(.large)
+                    } else {
+                        recordButton
+                            .buttonStyle(P2ButtonStyle(kind: kind, shape: .rounded, isLarge: true))
+                    }
                 }
-                .buttonStyle(P2ButtonStyle(kind: kind, shape: .rounded, isLarge: true))
                 .disabled(!canSave)
                 .padding()
             }
@@ -535,6 +539,17 @@ struct P2RepaymentSheet: View {
         }
         .presentationDetents([.large])
         .environment(\.explorationIconStyle, .soft)
+    }
+
+    private var recordButton: some View {
+        Button {
+            store.record(amount, on: payment.shareID, of: payment.personID, on: date)
+            dismiss()
+        } label: {
+            Text("Record \(amount, format: .currency(code: store.code))")
+                .monospacedDigit()
+                .frame(maxWidth: .infinity)
+        }
     }
 }
 
