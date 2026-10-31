@@ -123,10 +123,12 @@ struct RCScreen<Content: View, Pinned: View>: View {
                     }
                     .padding()
                 }
-                // Inside the pinned bar's inset, so the toast shows above the bar, not over it.
-                .rcUndoToast($undo, store: store)
+                // The toast and the pinned bar share one inset, the toast above the bar.
                 .safeAreaInset(edge: .bottom) {
-                    pinned(actions)
+                    VStack(spacing: 0) {
+                        RCUndoToastBar(undo: $undo, store: store)
+                        pinned(actions)
+                    }
                 }
             }
         }
@@ -169,7 +171,9 @@ extension View {
     }
 
     func rcUndoToast(_ undo: Binding<RCUndo?>, store: RCStore) -> some View {
-        modifier(RCUndoToast(undo: undo, store: store))
+        safeAreaInset(edge: .bottom) {
+            RCUndoToastBar(undo: undo, store: store)
+        }
     }
 }
 
@@ -195,47 +199,47 @@ struct RCEmptyState: View {
     }
 }
 
-/// People's Undo toast for confirming and skipping in one tap.
-struct RCUndoToast: ViewModifier {
+/// People's Undo toast for confirming and skipping in one tap, for the bottom safe area inset, above
+/// the tab bar. In an overlay on the scroll view it showed at the top, behind the bar's buttons.
+struct RCUndoToastBar: View {
     @Binding var undo: RCUndo?
     let store: RCStore
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    func body(content: Content) -> some View {
-        content
-            .overlay(alignment: .bottom) {
-                if let undo {
-                    HStack(spacing: 12) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                            .accessibilityHidden(true)
-                        Text(verbatim: undo.message)
-                            .font(.subheadline.weight(.medium))
-                            .lineLimit(2)
-                        Spacer(minLength: 8)
-                        Button("Undo") {
-                            store.undo(undo)
-                            self.undo = nil
-                        }
-                        .buttonStyle(P2ButtonStyle(kind: .tinted))
+    var body: some View {
+        VStack(spacing: 0) {
+            if let undo {
+                HStack(spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .accessibilityHidden(true)
+                    Text(verbatim: undo.message)
+                        .font(.subheadline.weight(.medium))
+                        .lineLimit(2)
+                    Spacer(minLength: 8)
+                    Button("Undo") {
+                        store.undo(undo)
+                        self.undo = nil
                     }
-                    .padding(.leading, 16)
-                    .padding(.trailing, 8)
-                    .padding(.vertical, 8)
-                    .background(.regularMaterial, in: .capsule)
-                    .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
-                    .padding(.horizontal)
-                    .padding(.bottom, 8)
-                    .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
-                    .task(id: undo) {
-                        AccessibilityNotification.Announcement(undo.message).post()
-                        try? await Task.sleep(for: .seconds(5))
-                        if !Task.isCancelled { self.undo = nil }
-                    }
+                    .buttonStyle(P2ButtonStyle(kind: .tinted))
+                }
+                .padding(.leading, 16)
+                .padding(.trailing, 8)
+                .padding(.vertical, 8)
+                .background(.regularMaterial, in: .capsule)
+                .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+                .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
+                .task(id: undo) {
+                    AccessibilityNotification.Announcement(undo.message).post()
+                    try? await Task.sleep(for: .seconds(5))
+                    if !Task.isCancelled { self.undo = nil }
                 }
             }
-            .animation(reduceMotion ? nil : .snappy, value: undo)
+        }
+        .animation(reduceMotion ? nil : .snappy, value: undo)
     }
 }
 
