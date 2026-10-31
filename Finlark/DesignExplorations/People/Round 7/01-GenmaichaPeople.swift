@@ -99,8 +99,8 @@ struct GenmaichaPerson: View {
 
 // MARK: - Pieces
 
-/// A round check in the system's blue Liquid Glass.
-private struct GenmaichaCheck: View {
+/// A round check in the system's blue Liquid Glass. Round 8 reuses it.
+struct GenmaichaCheck: View {
     /// What VoiceOver reads, like "Mark Cinema as paid".
     let title: Text
     let action: () -> Void
