@@ -72,6 +72,7 @@ let lkBlurRadius: CGFloat = 28
 struct LKHost<LockScreen: View, Cover: View>: View {
     @State private var lock: LKLock
     @State private var backgroundedAt: Date?
+    private let promptsOnOpen: Bool
     private let blursContent: Bool
     private let transition: AnyTransition
     private let lockScreen: (LKLock) -> LockScreen
@@ -81,18 +82,22 @@ struct LKHost<LockScreen: View, Cover: View>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// - Parameters:
+    ///   - promptsOnOpen: true asks right away on launch and on return, as SEC-001 wants. Off by default so
+    ///     a preview stays on the lock screen.
     ///   - blursContent: true for variants that show Home blurred behind the lock and the cover.
     ///   - transition: how the lock screen leaves once unlocked. Reduce Motion always fades.
     init(
         biometry: STBiometry = .faceID,
         phase: LKPhase = .locked,
         successPause: Duration = .zero,
+        promptsOnOpen: Bool = false,
         blursContent: Bool = false,
         transition: AnyTransition = .opacity,
         @ViewBuilder lockScreen: @escaping (LKLock) -> LockScreen,
         @ViewBuilder cover: () -> Cover
     ) {
         _lock = State(initialValue: LKLock(biometry: biometry, phase: phase, successPause: successPause))
+        self.promptsOnOpen = promptsOnOpen
         self.blursContent = blursContent
         self.transition = transition
         self.lockScreen = lockScreen
@@ -126,6 +131,11 @@ struct LKHost<LockScreen: View, Cover: View>: View {
                 }
             }
             .animation(.smooth(duration: 0.35), value: lock.phase)
+            .task {
+                if promptsOnOpen {
+                    lock.unlock()
+                }
+            }
             .onChange(of: scenePhase) { _, phase in
                 switch phase {
                 case .background:
@@ -133,6 +143,9 @@ struct LKHost<LockScreen: View, Cover: View>: View {
                 case .active:
                     if let backgroundedAt, Date.now.timeIntervalSince(backgroundedAt) >= lkRelockInterval {
                         lock.lock()
+                        if promptsOnOpen {
+                            lock.unlock()
+                        }
                     }
                     backgroundedAt = nil
                 default:

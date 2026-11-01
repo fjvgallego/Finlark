@@ -111,6 +111,8 @@ file when it's planned in detail.
 - FinanceKit integration (region-limited; requires an Apple entitlement).
 - Live Activities for an open split ("2 of 3 friends paid").
 - Apple Pay / Wallet hooks.
+- Custom app passcode: a passcode for App Lock that belongs to Finlark, so the lock also works on iPhones without a
+  device passcode (SEC-001).
 
 ## Dropped
 
