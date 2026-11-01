@@ -466,7 +466,7 @@ enum STText {
 
     /// "Face ID" or "Off"
     static func appLock(_ settings: STSettings) -> Text {
-        settings.appLock ? Text(settings.biometry.title) : Text("Off")
+        settings.locksApp ? Text(settings.biometry.title) : Text("Off")
     }
 
     /// "After 7 days"
@@ -594,7 +594,9 @@ struct STPermissionNote: View {
     }
 }
 
-/// App lock with what it does (SEC-001, SEC-002, A-14).
+/// App lock with what it does (SEC-001, SEC-002, A-14). Without a device passcode the switch is off and
+/// disabled, and a note says what to do. The note shows even where the footnote doesn't, and sits
+/// outside the disabled switch so it isn't dimmed.
 struct STAppLockControl: View {
     @Bindable var settings: STSettings
     var showsFootnote = true
@@ -605,12 +607,24 @@ struct STAppLockControl: View {
                 title: "App Lock",
                 symbol: settings.biometry.symbol,
                 color: STItem.appLock.color,
-                subtitle: Text("Use \(Text(settings.biometry.title)) to open Finlark"),
-                isOn: $settings.appLock
+                subtitle: subtitle,
+                isOn: Binding(
+                    get: { settings.locksApp },
+                    set: { settings.appLock = $0 }
+                )
             )
-            if showsFootnote {
+            .disabled(!settings.hasDevicePasscode)
+            if !settings.hasDevicePasscode || showsFootnote {
                 STAppLockFootnote(settings: settings)
             }
+        }
+    }
+
+    private var subtitle: Text {
+        if settings.hasDevicePasscode {
+            Text("Use \(Text(settings.biometry.title)) to open Finlark")
+        } else {
+            Text("Needs an iPhone passcode")
         }
     }
 }
@@ -619,9 +633,15 @@ struct STAppLockFootnote: View {
     let settings: STSettings
 
     var body: some View {
-        Text("Finlark asks when you open it and after a minute away. Your passcode works too. While it's locked, the app switcher shows a blurred screen.")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
+        Group {
+            if settings.hasDevicePasscode {
+                Text("Finlark asks when you open it and after a minute away. Your passcode works too. In the app switcher, Finlark hides your data.")
+            } else {
+                Text("To use App Lock, set a passcode for your iPhone in the Settings app.")
+            }
+        }
+        .font(.footnote)
+        .foregroundStyle(.secondary)
     }
 }
 

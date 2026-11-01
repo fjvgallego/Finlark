@@ -106,6 +106,9 @@ final class STSettings {
 
     var appLock: Bool
     let biometry: STBiometry
+    /// Without a device passcode there's nothing to ask for, so App Lock can't be on (SEC-001). Mocked:
+    /// the real app asks LocalAuthentication.
+    let hasDevicePasscode: Bool
 
     var sync: STSyncStatus
     var lastSynced: Date
@@ -130,6 +133,7 @@ final class STSettings {
         permission: STNotificationPermission,
         appLock: Bool,
         biometry: STBiometry = .faceID,
+        hasDevicePasscode: Bool = true,
         sync: STSyncStatus,
         lastSynced: Date = .now.addingTimeInterval(-120),
         categories: CTStore,
@@ -146,6 +150,7 @@ final class STSettings {
         self.permission = permission
         self.appLock = appLock
         self.biometry = biometry
+        self.hasDevicePasscode = hasDevicePasscode
         self.sync = sync
         self.lastSynced = lastSynced
         self.categories = categories
@@ -153,6 +158,9 @@ final class STSettings {
     }
 
     var canChangeCurrency: Bool { transactionCount == 0 }
+
+    /// Whether Finlark actually locks: App Lock is on and the iPhone has a passcode.
+    var locksApp: Bool { appLock && hasDevicePasscode }
 
     var activeCategoryCount: Int {
         categories.categories.filter { !$0.isArchived }.count
@@ -217,6 +225,25 @@ extension STSettings {
             sync: .syncing,
             categories: .fresh,
             recurring: .empty
+        )
+    }
+
+    /// An iPhone without a passcode: App Lock was on, but it can't lock anything now, so it shows off and
+    /// disabled (SEC-001).
+    static var noPasscode: STSettings {
+        STSettings(
+            accountName: String(localized: "Main account"),
+            startingBalance: Decimal(string: "1250.00") ?? 0,
+            currencyCode: "EUR",
+            transactionCount: 248,
+            peopleCount: 4,
+            permission: .allowed,
+            appLock: true,
+            biometry: .passcode,
+            hasDevicePasscode: false,
+            sync: .upToDate,
+            categories: .sample,
+            recurring: .sample
         )
     }
 

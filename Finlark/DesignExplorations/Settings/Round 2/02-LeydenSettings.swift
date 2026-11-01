@@ -25,6 +25,10 @@ struct LeydenSettings: View {
     STHost(settings: .fresh) { LeydenSettings(settings: $0) }
 }
 
+#Preview("Leyden · No Passcode") {
+    STHost(settings: .noPasscode) { LeydenSettings(settings: $0) }
+}
+
 #Preview("Leyden · Dark") {
     STHost { LeydenSettings(settings: $0) }
         .preferredColorScheme(.dark)
