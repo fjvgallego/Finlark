@@ -25,18 +25,21 @@ struct MarshHomeView: View {
     }
 
     @State private var model: ExplorationHomeModel
-    @State private var debtors = R6Debtor.sample
+    @State private var debtors: [R6Debtor]
     @State private var selection: Panel = .month
 
     /// `addingType` opens the add screen right away, and `addEditor` replaces the stand-in add screen.
+    /// `debtors` is empty for a Home with nobody owing money, such as right after onboarding.
     init(
         snapshot: ExplorationHomeSnapshot = .sample,
+        debtors: [R6Debtor] = R6Debtor.sample,
         addingType: ExplorationTransactionType? = nil,
         addEditor: ((ExplorationTransactionType) -> AnyView)? = nil
     ) {
         let model = ExplorationHomeModel(snapshot: snapshot, addEditor: addEditor)
         model.addingType = addingType
         _model = State(initialValue: model)
+        _debtors = State(initialValue: debtors)
     }
 
     private var snapshot: ExplorationHomeSnapshot { model.snapshot }
