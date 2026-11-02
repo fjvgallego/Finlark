@@ -672,44 +672,6 @@ struct OBAmountField: View {
     }
 }
 
-/// The amount as typed, for variants with their own keypad.
-struct OBAmountText: View {
-    let setup: OBSetup
-    var baseSize: CGFloat = 56
-    var tintsNegative = true
-
-    @ScaledMetric(relativeTo: .largeTitle) private var scale: CGFloat = 1
-
-    var body: some View {
-        let affix = AEMoney.affix(for: setup.currencyCode)
-        let size = min(baseSize * scale, baseSize * 1.5)
-
-        HStack(alignment: .firstTextBaseline, spacing: 4) {
-            if setup.isOverdrawn {
-                Text(verbatim: "−")
-            }
-            if affix.isLeading { symbol(affix.symbol, size: size) }
-            Text(verbatim: setup.balanceText.isEmpty ? "0" : setup.balanceText)
-                .foregroundStyle(setup.balanceText.isEmpty ? AnyShapeStyle(.tertiary) : AnyShapeStyle(.primary))
-            if !affix.isLeading { symbol(affix.symbol, size: size) }
-        }
-        .font(.system(size: size, weight: .bold, design: .rounded))
-        .monospacedDigit()
-        .foregroundStyle(tintsNegative && setup.isOverdrawn ? AnyShapeStyle(.red) : AnyShapeStyle(.primary))
-        .lineLimit(1)
-        .minimumScaleFactor(0.4)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Starting balance"))
-        .accessibilityValue(Text(setup.startingBalance, format: .currency(code: setup.currencyCode)))
-    }
-
-    private func symbol(_ symbol: String, size: CGFloat) -> some View {
-        Text(verbatim: symbol)
-            .font(.system(size: size * 0.6, weight: .semibold, design: .rounded))
-            .foregroundStyle(.secondary)
-    }
-}
-
 /// Whether the account is below zero. A switch, since the decimal pad has no minus key.
 struct OBOverdrawnToggle: View {
     @Bindable var setup: OBSetup
@@ -723,23 +685,6 @@ struct OBOverdrawnToggle: View {
                     .foregroundStyle(.secondary)
             }
         }
-    }
-}
-
-/// A plus-minus button for variants with their own keypad: on means overdrawn.
-struct OBSignButton: View {
-    @Bindable var setup: OBSetup
-
-    var body: some View {
-        Button {
-            setup.isOverdrawn.toggle()
-        } label: {
-            Label("Overdrawn", systemImage: "plus.forwardslash.minus")
-        }
-        .buttonStyle(.glass)
-        .tint(setup.isOverdrawn ? .red : nil)
-        .accessibilityAddTraits(setup.isOverdrawn ? .isSelected : [])
-        .accessibilityHint(Text("Makes the starting balance negative."))
     }
 }
 
@@ -821,52 +766,6 @@ struct OBLockActions: View {
                 OBSecondaryButton("Not Now", action: next)
             }
         }
-    }
-}
-
-/// App Lock as a switch, disabled without a passcode, for variants that set everything on one screen.
-struct OBLockToggle: View {
-    @Bindable var setup: OBSetup
-
-    var body: some View {
-        Toggle(isOn: setup.lockBinding) {
-            Label {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("App Lock")
-                    if setup.hasDevicePasscode {
-                        Text("Use \(Text(setup.biometry.title)) to open Finlark")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("Needs an iPhone passcode")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            } icon: {
-                STIcon(setup.biometry.symbol, color: STItem.appLock.color)
-            }
-        }
-        .disabled(!setup.hasDevicePasscode)
-    }
-}
-
-// MARK: - Categories (ONB-004)
-
-/// The default categories' icons, wrapped, with a count. VoiceOver reads the names.
-struct OBCategoryIcons: View {
-    let setup: OBSetup
-    var size: CGFloat = 30
-
-    var body: some View {
-        AEFlowLayout(spacing: 6, lineSpacing: 6) {
-            ForEach(setup.categories) { category in
-                CTBadge(symbol: category.symbol, color: category.color, size: size)
-            }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("^[\(setup.categories.count) category](inflect: true)"))
-        .accessibilityValue(Text(setup.categories.map(\.name).formatted(.list(type: .and))))
     }
 }
 #endif

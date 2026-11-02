@@ -210,63 +210,6 @@ struct AEMoneyField: View {
     }
 }
 
-/// An in-app number pad on Liquid Glass keys, for variants that don't use the system keyboard.
-/// Holding delete clears the amount.
-struct AEKeypad: View {
-    @Binding var text: String
-    let fractionDigits: Int
-
-    @ScaledMetric(relativeTo: .title2) private var keyHeight: CGFloat = 50
-    @State private var taps = 0
-
-    private let rows = [["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"]]
-
-    var body: some View {
-        GlassEffectContainer(spacing: 8) {
-            Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-                ForEach(rows, id: \.self) { row in
-                    GridRow {
-                        ForEach(row, id: \.self) { digit in
-                            key(Text(verbatim: digit)) { append(digit) }
-                        }
-                    }
-                }
-                GridRow {
-                    key(Text(verbatim: AEMoney.separator)) { append(AEMoney.separator) }
-                        .accessibilityLabel(Text("Decimal separator"))
-                        .disabled(fractionDigits == 0)
-                    key(Text(verbatim: "0")) { append("0") }
-                    key(Image(systemName: "delete.backward")) {
-                        text = String(text.dropLast())
-                    }
-                    .accessibilityLabel(Text("Delete"))
-                    .simultaneousGesture(LongPressGesture().onEnded { _ in text = "" })
-                }
-            }
-        }
-        .sensoryFeedback(.selection, trigger: taps)
-    }
-
-    private func append(_ character: String) {
-        text = AEMoney.sanitize(text + character, fractionDigits: fractionDigits)
-    }
-
-    private func key(_ label: some View, action: @escaping () -> Void) -> some View {
-        Button {
-            taps += 1
-            action()
-        } label: {
-            label
-                .font(.system(.title2, design: .rounded, weight: .semibold))
-                // Capped so large text can't push the rest of the screen out.
-                .frame(maxWidth: .infinity, minHeight: min(keyHeight, 64))
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 16, style: .continuous))
-    }
-}
-
 // MARK: - Type (TRX-002, TRX-003)
 
 /// Expense | Income. Locked while the expense is split, with the reason underneath.
@@ -364,44 +307,6 @@ private struct AEMatchedCell: ViewModifier {
     }
 }
 
-/// The most used categories as a row of chips that scrolls sideways.
-struct AECategoryChips: View {
-    @Bindable var draft: AEDraft
-
-    var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 8) {
-                ForEach(draft.type.frequentCategories) { category in
-                    let isSelected = draft.categoryID == category.id
-                    Button {
-                        draft.categoryID = category.id
-                    } label: {
-                        Label {
-                            Text(category.name)
-                        } icon: {
-                            Image(systemName: category.symbol)
-                                .foregroundStyle(category.color)
-                        }
-                        .font(.subheadline.weight(.medium))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(
-                            isSelected ? AnyShapeStyle(category.color.opacity(0.18)) : AnyShapeStyle(.fill.tertiary),
-                            in: .capsule
-                        )
-                        .overlay {
-                            Capsule().strokeBorder(isSelected ? category.color : .clear, lineWidth: 1.5)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityAddTraits(isSelected ? .isSelected : [])
-                }
-            }
-        }
-        .scrollIndicators(.hidden)
-    }
-}
-
 /// The selected category as a label, or a prompt.
 struct AECategoryLabel: View {
     let category: ExplorationCategory?
@@ -419,62 +324,6 @@ struct AECategoryLabel: View {
             Text("Choose")
                 .foregroundStyle(.secondary)
         }
-    }
-}
-
-/// Categories as a list to push to, as Settings-style pickers do.
-struct AECategoryListScreen: View {
-    @Bindable var draft: AEDraft
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        List(draft.type.categories) { category in
-            Button {
-                draft.categoryID = category.id
-                dismiss()
-            } label: {
-                HStack(spacing: 12) {
-                    ExplorationCategoryIcon(category: category)
-                    Text(category.name)
-                    Spacer()
-                    if draft.categoryID == category.id {
-                        Image(systemName: "checkmark")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.tint)
-                    }
-                }
-                .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-            .accessibilityAddTraits(draft.categoryID == category.id ? .isSelected : [])
-        }
-        .navigationTitle("Category")
-        .navigationBarTitleDisplayMode(.inline)
-        .environment(\.explorationIconStyle, .soft)
-    }
-}
-
-/// The category grid in its own sheet.
-struct AECategorySheet: View {
-    @Bindable var draft: AEDraft
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                AECategoryGrid(draft: draft) { dismiss() }
-                    .padding()
-            }
-            .navigationTitle("Category")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close", systemImage: "xmark", role: .close) { dismiss() }
-                }
-            }
-        }
-        .presentationDetents([.medium, .large])
-        .environment(\.explorationIconStyle, .soft)
     }
 }
 
@@ -502,75 +351,6 @@ struct AEDateText: View {
                 ? Text("on \(date, format: .dateTime.day().month().year())")
                 : Text(date, format: .dateTime.day().month().year())
         }
-    }
-}
-
-/// Quick dates in a menu, plus a full calendar. Dates can be past or future (TRX-001).
-struct AEDateMenu<MenuLabel: View>: View {
-    @Bindable var draft: AEDraft
-    @ViewBuilder var label: MenuLabel
-
-    @State private var isPicking = false
-
-    var body: some View {
-        Menu {
-            Button("Today", systemImage: "calendar") { draft.date = .now }
-            Button("Yesterday", systemImage: "calendar.badge.clock") {
-                draft.date = Calendar.current.date(byAdding: .day, value: -1, to: .now) ?? .now
-            }
-            Button("Choose a date…", systemImage: "calendar.circle") { isPicking = true }
-        } label: {
-            label
-        }
-        .sheet(isPresented: $isPicking) {
-            AEDateSheet(date: $draft.date)
-        }
-    }
-}
-
-struct AEDateSheet: View {
-    @Binding var date: Date
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            DatePicker("Date", selection: $date, displayedComponents: .date)
-                .datePickerStyle(.graphical)
-                .padding(.horizontal)
-                .navigationTitle("Date")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Done", systemImage: "checkmark", role: .confirm) { dismiss() }
-                    }
-                }
-        }
-        .presentationDetents([.medium, .large])
-    }
-}
-
-struct AENoteSheet: View {
-    @Binding var note: String
-    @Environment(\.dismiss) private var dismiss
-    @FocusState private var isFocused: Bool
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                TextField("Note", text: $note, prompt: Text("What was it for?"), axis: .vertical)
-                    .lineLimit(3...6)
-                    .focused($isFocused)
-            }
-            .navigationTitle("Note")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done", systemImage: "checkmark", role: .confirm) { dismiss() }
-                }
-            }
-            .onAppear { isFocused = true }
-        }
-        .presentationDetents([.medium])
     }
 }
 
@@ -874,76 +654,6 @@ struct AESplitFooter: View {
             }
         }
         .font(.footnote)
-    }
-}
-
-/// The whole split editor as Form sections: switch, people, mode, items and shares.
-struct AESplitFormSections: View {
-    @Bindable var draft: AEDraft
-    /// Off when the screen around it already has the switch.
-    var showsToggle = true
-
-    var body: some View {
-        if showsToggle {
-            Section {
-                Toggle(isOn: $draft.isSplit) {
-                    Label("Split with friends", systemImage: "person.2.fill")
-                }
-            } footer: {
-                if !draft.isSplit {
-                    Text("For an expense you paid that others owe you part of.")
-                }
-            }
-        }
-
-        if draft.isSplit {
-            Section("With") {
-                AEPeoplePicker(draft: draft)
-                    .padding(.vertical, 4)
-            }
-            Section {
-                AESplitModePicker(draft: draft)
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets())
-            } footer: {
-                Text(draft.splitMode.explanation)
-            }
-            if draft.splitMode == .byItem {
-                Section("Items") {
-                    AEItemRows(draft: draft)
-                }
-            }
-            Section {
-                AEShareRows(draft: draft)
-            } header: {
-                Text("Shares")
-            } footer: {
-                AESplitFooter(draft: draft)
-            }
-        }
-    }
-}
-
-/// The split editor in its own sheet, for variants that keep the main screen short.
-struct AESplitSheet: View {
-    @Bindable var draft: AEDraft
-    var showsToggle = true
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                AESplitFormSections(draft: draft, showsToggle: showsToggle)
-            }
-            .navigationTitle("Split")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done", systemImage: "checkmark", role: .confirm) { dismiss() }
-                }
-            }
-        }
-        .presentationDetents([.medium, .large])
     }
 }
 

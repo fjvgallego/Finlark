@@ -150,38 +150,6 @@ struct HY2Chip<Title: View>: View {
 
 // MARK: - Month summary
 
-/// Income, spending and the difference, side by side, or stacked when they don't fit. With a type
-/// filter on, only that type's total shows: income of zero next to filtered expenses says nothing.
-struct HY2Figures: View {
-    let totals: HYTotals
-    let code: String
-    var type: HYTypeFilter = .all
-    var font: Font = .headline
-
-    var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .top, spacing: 16) {
-                figures
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            VStack(alignment: .leading, spacing: 10) { figures }
-        }
-    }
-
-    @ViewBuilder
-    private var figures: some View {
-        if type != .expense {
-            R2Figure(title: "Income", value: totals.income, code: code, font: font)
-        }
-        if type != .income {
-            R2Figure(title: "Spending", value: totals.spending, code: code, font: font)
-        }
-        if type == .all {
-            R2Figure(title: "Difference", value: totals.difference, code: code, signed: true, font: font)
-        }
-    }
-}
-
 /// A month's name and difference on one line, income and spending under them. Pinned while its days
 /// scroll by, in the variants that show every month.
 struct HY2MonthBar: View {

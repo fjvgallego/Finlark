@@ -126,40 +126,7 @@ struct P8SettleAllButton: View {
     }
 }
 
-/// A short "Settle All" capsule for headings and total lines. VoiceOver also hears the total.
-struct P8CompactSettleButton: View {
-    let person: PPPerson
-    let code: String
-    var controlSize: ControlSize = .regular
-    let action: () -> Void
-
-    var body: some View {
-        Button("Settle All", action: action)
-            .buttonStyle(.glassProminent)
-            .controlSize(controlSize)
-            .accessibilityLabel(Text("Settle all, \(person.owed.formatted(.currency(code: code)))"))
-    }
-}
-
 // MARK: - Share pieces
-
-/// "Open shares" over a group of cards that aren't in one tile.
-struct P8SectionTitle: View {
-    let title: LocalizedStringKey
-
-    init(_ title: LocalizedStringKey) {
-        self.title = title
-    }
-
-    var body: some View {
-        Text(title)
-            .font(.headline)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 4)
-            .padding(.top, 4)
-            .accessibilityAddTraits(.isHeader)
-    }
-}
 
 /// What's left on a share, large, with "left" under it.
 struct P8Remaining: View {

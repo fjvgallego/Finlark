@@ -331,38 +331,6 @@ extension PPReminderButton where Label == SwiftUI.Label<Text, Image> {
     }
 }
 
-/// Settle all and Share reminder side by side, or stacked when they don't fit. Nothing when the person
-/// owes nothing.
-struct PPActions: View {
-    let store: PPStore
-    let person: PPPerson
-
-    var body: some View {
-        if person.owes {
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 10) { buttons }
-                VStack(spacing: 10) { buttons }
-            }
-            .controlSize(.large)
-        }
-    }
-
-    @ViewBuilder
-    private var buttons: some View {
-        PPReminderButton(store: store, person: person) {
-            Label("Remind", systemImage: "bubble.left.and.text.bubble.right")
-                .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.glass)
-        PPSettleAllButton(store: store, person: person) {
-            Label("Settle All", systemImage: "checkmark.circle.fill")
-                .fontWeight(.semibold)
-                .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.glassProminent)
-    }
-}
-
 // MARK: - Text
 
 enum PPText {
@@ -468,58 +436,6 @@ struct PPPersonRow: View {
     }
 }
 
-/// An open share: ticket and date, what's left, and its status in words (PPL-003, SPL-005).
-struct PPShareRow: View {
-    let share: PPShare
-    let code: String
-    var showsBar = false
-    var showsIcon = true
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top, spacing: 12) {
-                if showsIcon, !dynamicTypeSize.isAccessibilitySize {
-                    ExplorationCategoryIcon(category: share.category)
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: share.ticket)
-                        .font(.headline)
-                    AEDateText(date: share.date)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    if dynamicTypeSize.isAccessibilitySize {
-                        remaining
-                    }
-                    PPStatusLabel(share: share, code: code)
-                        .font(.subheadline)
-                        .padding(.top, 2)
-                }
-                if !dynamicTypeSize.isAccessibilitySize {
-                    Spacer(minLength: 8)
-                    remaining
-                }
-            }
-            if showsBar {
-                PPProgressBar(share: share, color: share.status.tint)
-            }
-        }
-        .monospacedDigit()
-        .accessibilityElement(children: .combine)
-    }
-
-    private var remaining: some View {
-        VStack(alignment: .trailing, spacing: 0) {
-            Text(share.remaining, format: .currency(code: code))
-                .font(.headline)
-            Text("left")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-    }
-}
-
 /// A settled share: ticket, when it was paid back, and the share.
 struct PPSettledRow: View {
     let share: PPShare
@@ -545,21 +461,6 @@ struct PPSettledRow: View {
         }
         .font(.subheadline)
         .accessibilityElement(children: .combine)
-    }
-}
-
-/// The share's status with its icon and words, never color alone (NFR-003).
-struct PPStatusLabel: View {
-    let share: PPShare
-    let code: String
-
-    var body: some View {
-        Label {
-            share.statusText(code: code)
-        } icon: {
-            Image(systemName: share.status.symbol)
-                .foregroundStyle(share.status.tint)
-        }
     }
 }
 
@@ -603,48 +504,6 @@ struct PPAvatarStack: View {
 }
 
 // MARK: - Empty and archived
-
-/// No people yet (PPL-001), with a way to add the first one.
-struct PPEmptyState: View {
-    let store: PPStore
-
-    @State private var isAdding = false
-
-    var body: some View {
-        ContentUnavailableView {
-            Label("No People Yet", systemImage: "person.2")
-        } description: {
-            Text("Add the friends you split expenses with, or add them while you split. They don't need Finlark.")
-        } actions: {
-            Button("Add Person") { isAdding = true }
-                .buttonStyle(.glassProminent)
-        }
-        .sheet(isPresented: $isAdding) {
-            PPAddSheet(store: store)
-        }
-    }
-}
-
-/// "Archived · 1", linking to the archived people. Nothing when there are none.
-struct PPArchivedLink: View {
-    let store: PPStore
-
-    var body: some View {
-        if !store.archived.isEmpty {
-            NavigationLink(value: PPRoute.archived) {
-                HStack {
-                    Label("Archived", systemImage: "archivebox")
-                    Spacer(minLength: 8)
-                    Text(store.archived.count, format: .number)
-                        .foregroundStyle(.secondary)
-                    R2Chevron()
-                }
-                .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-}
 
 /// People hidden from pickers, with their history kept (PPL-004).
 struct PPArchivedScreen: View {

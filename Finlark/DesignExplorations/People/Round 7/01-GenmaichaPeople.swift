@@ -6,7 +6,7 @@
 //  the owner's last calls: no partial repayments from a share, so each share has one control, a check
 //  that records all that's left (SPL-006); Settle All for two or more shares (SPL-008); Undo in a toast
 //  after both; and the share reminder (NTF-003) kept in the bar. Every button uses the system's blue
-//  Liquid Glass, `.glassProminent`, on the list and on the person alike.
+//  Liquid Glass, `.glassProminent`. The person screen is Financier.
 //
 
 #if DEBUG
@@ -60,43 +60,6 @@ struct GenmaichaPeople: View {
     }
 }
 
-// MARK: - Person
-
-/// Dahlia's header, Settle All, the open shares each with a check, then the settled ones (PPL-003).
-/// A partly paid share still shows what came back, since PPL-003 lists "paid so far".
-struct GenmaichaPerson: View {
-    @Bindable var store: PPStore
-    let id: PPPerson.ID
-
-    var body: some View {
-        P5PersonScreen(store: store, id: id) { share, actions in
-            P5Row {
-                VStack(alignment: .leading, spacing: 3) {
-                    P5ShareTitle(share: share, code: store.code)
-                    Text("\(share.remaining, format: .currency(code: store.code)) left")
-                        .font(.headline)
-                        .monospacedDigit()
-                        .padding(.top, 2)
-                }
-            } controls: {
-                GenmaichaCheck(title: Text("Mark \(share.ticket) as paid"), action: actions.markPaid)
-            }
-        } settle: { person, settleAll in
-            Button(action: settleAll) {
-                Label {
-                    Text("Settle All · \(person.owed, format: .currency(code: store.code))")
-                        .monospacedDigit()
-                } icon: {
-                    Image(systemName: "checkmark.circle.fill")
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.glassProminent)
-            .controlSize(.large)
-        }
-    }
-}
-
 // MARK: - Pieces
 
 /// A round check in the system's blue Liquid Glass. Round 8 reuses it.
@@ -142,27 +105,19 @@ private struct GenmaichaEmptyState: View {
 }
 
 #Preview("Genmaicha") {
-    PPHost { GenmaichaPeople(store: $0) } person: { GenmaichaPerson(store: $0, id: $1) }
-}
-
-#Preview("Genmaicha · Marta") {
-    PPHost(opening: "marta") { GenmaichaPeople(store: $0) } person: { GenmaichaPerson(store: $0, id: $1) }
-}
-
-#Preview("Genmaicha · Luis") {
-    PPHost(opening: "luis") { GenmaichaPeople(store: $0) } person: { GenmaichaPerson(store: $0, id: $1) }
+    PPHost { GenmaichaPeople(store: $0) } person: { FinancierPerson(store: $0, id: $1) }
 }
 
 #Preview("Genmaicha · Settled up") {
-    PPHost(store: .settledUp) { GenmaichaPeople(store: $0) } person: { GenmaichaPerson(store: $0, id: $1) }
+    PPHost(store: .settledUp) { GenmaichaPeople(store: $0) } person: { FinancierPerson(store: $0, id: $1) }
 }
 
 #Preview("Genmaicha · Empty") {
-    PPHost(store: .empty) { GenmaichaPeople(store: $0) } person: { GenmaichaPerson(store: $0, id: $1) }
+    PPHost(store: .empty) { GenmaichaPeople(store: $0) } person: { FinancierPerson(store: $0, id: $1) }
 }
 
 #Preview("Genmaicha · Dark") {
-    PPHost(opening: "luis") { GenmaichaPeople(store: $0) } person: { GenmaichaPerson(store: $0, id: $1) }
+    PPHost(opening: "luis") { GenmaichaPeople(store: $0) } person: { FinancierPerson(store: $0, id: $1) }
         .preferredColorScheme(.dark)
 }
 #endif

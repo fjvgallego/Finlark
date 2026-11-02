@@ -176,58 +176,6 @@ struct HYSplitLabel: View {
     }
 }
 
-/// Today, Yesterday or the date, and what was spent that day.
-struct HYDayHeader: View {
-    let day: HYDay
-    let code: String
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            AEDateText(date: day.date)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
-                .accessibilityAddTraits(.isHeader)
-            Spacer(minLength: 8)
-            if day.totals.spending > 0 {
-                Text("Spent \(day.totals.spending, format: .currency(code: code))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-            }
-        }
-        .textCase(nil)
-    }
-}
-
-/// A day's rows in one glass tile, with dividers.
-struct HYDayTile: View {
-    let day: HYDay
-    let code: String
-    var showsHeader = true
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if showsHeader {
-                HYDayHeader(day: day, code: code)
-                    .padding(.horizontal, 6)
-            }
-            R2Tile(padding: 14) {
-                VStack(spacing: 12) {
-                    ForEach(day.records) { record in
-                        if record.id != day.records.first?.id {
-                            Divider()
-                        }
-                        NavigationLink(value: record) {
-                            HYRow(record: record, showsChevron: true)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-        }
-    }
-}
-
 // MARK: - Months and totals
 
 enum HYFormat {
@@ -246,39 +194,6 @@ enum HYFormat {
             Text(date, format: .dateTime.month(.abbreviated))
         } else {
             Text(date, format: .dateTime.month(.abbreviated).year(.twoDigits))
-        }
-    }
-}
-
-/// Income and spending side by side, or stacked when they don't fit (TRX-005).
-struct HYTotalsRow: View {
-    let totals: HYTotals
-    let code: String
-    var font: Font = .title3.weight(.semibold)
-
-    var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .top, spacing: 24) { figures }
-            VStack(alignment: .leading, spacing: 10) { figures }
-        }
-    }
-
-    @ViewBuilder
-    private var figures: some View {
-        R2Figure(title: "Income", value: totals.income, code: code, font: font)
-        R2Figure(title: "Spending", value: totals.spending, code: code, font: font)
-    }
-}
-
-/// Says the totals cover what's shown when filters or search narrow the list.
-struct HYNarrowedNote: View {
-    let store: HYStore
-
-    var body: some View {
-        if store.isSearching, store.searchesEveryMonth {
-            Label("Totals for these results, across every month.", systemImage: "magnifyingglass")
-        } else if store.isNarrowed {
-            Label("Totals for what's shown.", systemImage: "line.3.horizontal.decrease")
         }
     }
 }
@@ -339,26 +254,6 @@ struct HYFilterMenu: View {
         }
         .menuActionDismissBehavior(.disabled)
         .accessibilityValue(store.hasFilters ? Text("\(store.filterCount) on") : Text("Off"))
-    }
-}
-
-/// Every category of the type filter as a toggle chip, in a horizontal row.
-struct HYCategoryChips: View {
-    @Bindable var store: HYStore
-
-    var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 8) {
-                ForEach(store.categoryOptions) { category in
-                    AE2CategoryChip(category: category, isSelected: store.categoryIDs.contains(category.id)) {
-                        store.toggle(category)
-                    }
-                }
-            }
-            .padding(.horizontal)
-        }
-        .scrollIndicators(.hidden)
-        .scrollClipDisabled()
     }
 }
 

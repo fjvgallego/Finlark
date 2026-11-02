@@ -283,27 +283,6 @@ final class ExplorationHomeModel {
     }
 }
 
-private struct ExplorationScaffold: ViewModifier {
-    @Bindable var model: ExplorationHomeModel
-
-    func body(content: Content) -> some View {
-        content
-            .navigationDestination(for: ExplorationDestination.self) { destination in
-                ExplorationPlaceholderScreen(destination: destination)
-            }
-            .sheet(item: $model.addingType) { type in
-                ExplorationAddSheet(type: type, currencyCode: model.snapshot.currencyCode)
-            }
-    }
-}
-
-extension View {
-    /// Wires the placeholder destinations and the quick-add sheet (HOM-007) shared by every variation.
-    func explorationScaffold(_ model: ExplorationHomeModel) -> some View {
-        modifier(ExplorationScaffold(model: model))
-    }
-}
-
 // MARK: - Placeholder destinations
 
 struct ExplorationPlaceholderScreen: View {
@@ -573,92 +552,6 @@ struct ExplorationDueText: View {
             Text("Due today")
         } else {
             Text("Due \(date, format: .dateTime.day().month())")
-        }
-    }
-}
-
-/// A pending recurring item with quick Confirm and Skip (HOM-005).
-struct ExplorationPendingRow: View {
-    let item: ExplorationPendingItem
-    let currencyCode: String
-    let onConfirm: () -> Void
-    let onSkip: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 12) {
-                ExplorationCategoryIcon(category: item.category)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(item.note)
-                    ExplorationDueText(date: item.dueDate)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer(minLength: 8)
-                Text(item.type == .expense ? -item.amount : item.amount,
-                     format: .currency(code: currencyCode).sign(strategy: .always()))
-                    .monospacedDigit()
-            }
-            .accessibilityElement(children: .combine)
-
-            HStack {
-                Button("Skip", systemImage: "forward.end", action: onSkip)
-                    .buttonStyle(.bordered)
-                    .accessibilityLabel(Text("Skip \(item.note)"))
-                Button("Confirm", systemImage: "checkmark", action: onConfirm)
-                    .buttonStyle(.borderedProminent)
-                    .accessibilityLabel(Text("Confirm \(item.note)"))
-            }
-            .controlSize(.small)
-        }
-    }
-}
-
-/// Spending by category as a donut (HOM-002). Each sector carries a VoiceOver label and value.
-struct ExplorationSpendingDonut: View {
-    let spending: [ExplorationCategorySpending]
-    let currencyCode: String
-
-    var body: some View {
-        Chart(spending) { item in
-            SectorMark(
-                angle: .value("Amount", item.amount.plotValue),
-                innerRadius: .ratio(0.62),
-                angularInset: 1.5
-            )
-            .cornerRadius(3)
-            .foregroundStyle(item.category.color)
-            .accessibilityLabel(Text(item.category.name))
-            .accessibilityValue(Text(item.amount, format: .currency(code: currencyCode)))
-        }
-    }
-}
-
-/// Spending by category as horizontal bars (HOM-002). Axis labels resolve in the environment locale.
-struct ExplorationSpendingBars: View {
-    let spending: [ExplorationCategorySpending]
-    let currencyCode: String
-
-    var body: some View {
-        Chart(spending) { item in
-            BarMark(
-                x: .value("Amount", item.amount.plotValue),
-                y: .value("Category", item.category.id)
-            )
-            .cornerRadius(4)
-            .foregroundStyle(item.category.color)
-            .accessibilityLabel(Text(item.category.name))
-            .accessibilityValue(Text(item.amount, format: .currency(code: currencyCode)))
-        }
-        .chartXAxis(.hidden)
-        .chartYAxis {
-            AxisMarks { value in
-                AxisValueLabel {
-                    if let id = value.as(String.self), let item = spending.first(where: { $0.id == id }) {
-                        Text(item.category.name)
-                    }
-                }
-            }
         }
     }
 }

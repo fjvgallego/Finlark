@@ -50,53 +50,6 @@ struct RC2MonthlyHeader: View {
     }
 }
 
-/// Passacaglia's header: what's waiting to be confirmed, or that nothing is and what's next.
-struct RC2PendingHeader: View {
-    let store: RCStore
-
-    var body: some View {
-        let pending = store.pending
-        VStack(spacing: 4) {
-            if pending.isEmpty {
-                Image(systemName: "checkmark.seal.fill")
-                    .font(.largeTitle)
-                    .foregroundStyle(.green)
-                    .padding(.bottom, 4)
-                Text("All caught up")
-                    .font(.title2.weight(.bold))
-                RC2NextLine(store: store)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } else {
-                Text(store.pendingTotal, format: .currency(code: store.code).sign(strategy: .always()))
-                    .font(.largeTitle.weight(.bold))
-                    .monospacedDigit()
-                Text("^[\(pending.count) item](inflect: true) waiting for you to confirm")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Text("Not in your balance until you do.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .multilineTextAlignment(.center)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        .accessibilityElement(children: .combine)
-    }
-}
-
-/// "Next: Veggie box on Tuesday, 3 Nov".
-struct RC2NextLine: View {
-    let store: RCStore
-
-    var body: some View {
-        if let next = store.upcoming(days: 366).first, let template = store.template(next.templateID) {
-            Text("Next: \(template.title) on \(next.date, format: .dateTime.weekday(.wide).day().month())")
-        }
-    }
-}
-
 // MARK: - Pending slider
 
 /// "Pending 4" with the total trailing, over the slider.

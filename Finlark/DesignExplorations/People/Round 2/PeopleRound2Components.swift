@@ -60,77 +60,6 @@ struct P2ButtonStyle: ButtonStyle {
     }
 }
 
-/// A round, icon-only button for quick actions on a row. The label still carries a title for VoiceOver.
-struct P2IconButtonStyle: ButtonStyle {
-    var kind: P2ButtonStyle.Kind
-    var tint: Color = .accentColor
-
-    @ScaledMetric private var size: CGFloat = 36
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .labelStyle(.iconOnly)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(P2Ink.foreground(kind, tint: tint))
-            .frame(width: size, height: size)
-            .background { P2Ink.background(kind, tint: tint, in: AnyShape(Circle())) }
-            .contentShape(.circle)
-            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.9 : 1)
-            .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: configuration.isPressed)
-    }
-}
-
-/// A square action, icon over title, like Dahlia's (and Contacts') action buttons, in a custom look.
-struct P2SquareButtonStyle: ButtonStyle {
-    var kind: P2ButtonStyle.Kind
-    var tint: Color = .accentColor
-
-    @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .labelStyle(P2StackedLabelStyle())
-            .foregroundStyle(P2Ink.foreground(kind, tint: tint))
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .padding(.horizontal, 8)
-            .background {
-                P2Ink.background(kind, tint: tint, in: AnyShape(RoundedRectangle(cornerRadius: 20, style: .continuous)))
-            }
-            .opacity(isEnabled ? 1 : 0.45)
-            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.96 : 1)
-            .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: configuration.isPressed)
-    }
-}
-
-struct P2StackedLabelStyle: LabelStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        P2StackedLabel(icon: configuration.icon, title: configuration.title)
-    }
-}
-
-/// Icons differ in height, so the icon sits in a fixed, scaled box and titles line up across buttons.
-private struct P2StackedLabel<Icon: View, Title: View>: View {
-    let icon: Icon
-    let title: Title
-
-    @ScaledMetric(relativeTo: .title2) private var iconHeight: CGFloat = 28
-
-    var body: some View {
-        VStack(spacing: 6) {
-            icon
-                .font(.title2)
-                .frame(height: iconHeight)
-            title
-                .font(.subheadline.weight(.semibold))
-                .fontDesign(.rounded)
-                .multilineTextAlignment(.center)
-        }
-    }
-}
-
 /// Colors for the custom buttons. White text sits only on the accent or another dark tint, so it
 /// keeps AA contrast; ink buttons invert with the appearance.
 enum P2Ink {
@@ -257,23 +186,6 @@ struct P2QuickRow<Actions: View>: View {
     }
 }
 
-/// Quick-action pills on a second line under a person row: indented under the name, or stacked
-/// full-width at accessibility sizes.
-struct P2PillLine<Actions: View>: View {
-    @ViewBuilder let actions: Actions
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
-    var body: some View {
-        if dynamicTypeSize.isAccessibilitySize {
-            VStack(alignment: .leading, spacing: 8) { actions }
-        } else {
-            HStack(spacing: 8) { actions }
-                .padding(.leading, 48)
-        }
-    }
-}
-
 /// Archived people stay reachable (PPL-004) through a quiet line at the end of the list instead of a
 /// section of their own. Nothing when there are none.
 struct P2ArchivedFootnote: View {
@@ -295,28 +207,6 @@ struct P2ArchivedFootnote: View {
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
-        }
-    }
-}
-
-/// No people yet, with a custom Add Person button.
-struct P2EmptyState: View {
-    let store: PPStore
-    var kind: P2ButtonStyle.Kind = .filled
-
-    @State private var isAdding = false
-
-    var body: some View {
-        ContentUnavailableView {
-            Label("No People Yet", systemImage: "person.2")
-        } description: {
-            Text("Add the friends you split expenses with, or add them while you split. They don't need Finlark.")
-        } actions: {
-            Button("Add Person", systemImage: "plus") { isAdding = true }
-                .buttonStyle(P2ButtonStyle(kind: kind))
-        }
-        .sheet(isPresented: $isAdding) {
-            PPAddSheet(store: store)
         }
     }
 }
@@ -344,31 +234,6 @@ struct P2PersonHeader: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
         .accessibilityElement(children: .combine)
-    }
-}
-
-/// Dahlia's square actions: Remind, and Settle all when there's more than one share to settle. With a
-/// single open share, paying that share is the same thing, so the share's own button is enough.
-struct P2PersonActions: View {
-    let store: PPStore
-    let person: PPPerson
-    var kind: P2ButtonStyle.Kind = .tinted
-    var tint: Color = .accentColor
-
-    var body: some View {
-        if person.owes {
-            HStack(spacing: r2TileSpacing) {
-                PPReminderButton(store: store, person: person) {
-                    Label("Remind", systemImage: "bubble.left.and.text.bubble.right.fill")
-                }
-                if person.openShares.count > 1 {
-                    PPSettleAllButton(store: store, person: person) {
-                        Label("Settle All", systemImage: "checkmark.circle.fill")
-                    }
-                }
-            }
-            .buttonStyle(P2SquareButtonStyle(kind: kind, tint: tint))
-        }
     }
 }
 

@@ -407,30 +407,6 @@ struct RCPendingButtons: View {
     }
 }
 
-/// A round Skip next to People's round check, for compact rows.
-struct RCQuickControls: View {
-    let store: RCStore
-    let item: RCPending
-    let actions: RCActions
-
-    var body: some View {
-        let title = store.template(item.templateID)?.title ?? ""
-        HStack(spacing: 8) {
-            Button { actions.skip(item) } label: {
-                Label {
-                    Text("Skip \(title)")
-                } icon: {
-                    Image(systemName: "forward.end")
-                }
-                .labelStyle(.iconOnly)
-            }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
-            GenmaichaCheck(title: Text("Confirm \(title)")) { actions.confirm(item) }
-        }
-    }
-}
-
 /// A heading over cards that aren't in one tile, with a count.
 struct RCSectionTitle: View {
     let title: LocalizedStringKey
@@ -505,24 +481,6 @@ struct RCCaughtUp: View {
             }
             .accessibilityElement(children: .combine)
         }
-    }
-}
-
-/// What the active templates come to in an average month.
-struct RCMonthlyFigures: View {
-    let store: RCStore
-
-    var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .top, spacing: 24) { figures }
-            VStack(alignment: .leading, spacing: 10) { figures }
-        }
-    }
-
-    @ViewBuilder
-    private var figures: some View {
-        R2Figure(title: "Out each month", value: store.monthlyTotal(.expense), code: store.code)
-        R2Figure(title: "In each month", value: store.monthlyTotal(.income), code: store.code)
     }
 }
 

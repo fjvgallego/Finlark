@@ -453,26 +453,6 @@ extension TDPersonLine where Leading == AEAvatar {
     }
 }
 
-/// How much of the share is paid, in the person's color. Decorative: the status says it in words.
-struct TDProgressBar: View {
-    let debt: TDDebt
-
-    @ScaledMetric private var height: CGFloat = 6
-
-    var body: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .leading) {
-                Capsule().fill(.quaternary)
-                Capsule()
-                    .fill(debt.person.color)
-                    .frame(width: proxy.size.width * debt.progress)
-            }
-        }
-        .frame(height: height)
-        .accessibilityHidden(true)
-    }
-}
-
 /// A ring that fills as the share is paid, with a check when it's done. Decorative.
 struct TDProgressRing: View {
     let debt: TDDebt
@@ -535,36 +515,6 @@ struct TDRepaymentLine: View {
         }
         .font(.subheadline)
         .accessibilityElement(children: .combine)
-    }
-}
-
-/// A person's repayments as small chips (amount and date) that scroll sideways. Tapping one edits it.
-struct TDRepaymentChips: View {
-    let debt: TDDebt
-    let record: TDRecord
-    let onEdit: (TDRepayment) -> Void
-
-    var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 6) {
-                ForEach(debt.repayments) { repayment in
-                    Button {
-                        onEdit(repayment)
-                    } label: {
-                        Text("\(repayment.amount, format: .currency(code: record.code)) · \(repayment.date, format: .dateTime.day().month())")
-                            .font(.caption.weight(.medium))
-                            .monospacedDigit()
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(.fill.tertiary, in: .capsule)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text("Repayment of \(repayment.amount.formatted(.currency(code: record.code))) on \(repayment.date.formatted(.dateTime.day().month()))"))
-                    .accessibilityHint(Text("Edit or delete this repayment"))
-                }
-            }
-        }
-        .scrollIndicators(.hidden)
     }
 }
 

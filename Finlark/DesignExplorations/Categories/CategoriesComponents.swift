@@ -104,18 +104,6 @@ struct CTActions {
     let unarchive: (CTCategory) -> Void
 }
 
-/// How the editor lays out its parts. Each variant picks one.
-enum CTEditorStyle {
-    /// A tile for each part: preview and name, type, color, icon.
-    case tiles
-    /// Satin: live previews on top, then icon or color in one big picker.
-    case studio
-    /// Paisley: icons suggested from the name as it's typed.
-    case suggest
-    /// Gingham: a half-height sheet with the icons in rows that scroll sideways.
-    case compact
-}
-
 enum CTEditorTarget: Identifiable, Hashable {
     case new(ExplorationTransactionType, name: String)
     case edit(CTCategory.ID)
@@ -142,7 +130,6 @@ struct CTScreen<Content: View>: View {
     @Bindable var store: CTStore
     /// The type the add button starts a new category with.
     var addType: ExplorationTransactionType = .expense
-    var editorStyle: CTEditorStyle = .tiles
     /// False when the content brings its own scrolling container, such as a List.
     var scrolls = true
     var showsAddButton = true
@@ -197,7 +184,6 @@ struct CTScreen<Content: View>: View {
             CTEditorSheet(
                 store: store,
                 target: target,
-                style: editorStyle,
                 onArchive: { category in afterEditor = { archive(category) } },
                 onUnarchive: { category in afterEditor = { unarchive(category) } }
             )
@@ -346,112 +332,6 @@ struct CTBadge: View {
 
 // MARK: - Rows
 
-enum CTRowDetail {
-    case none
-    case count
-    /// The type and the count under the name, for lists that mix both types.
-    case typeAndCount
-}
-
-/// A category: icon and name leading, how much it's used trailing. At accessibility sizes the
-/// trailing part moves under the name and the icon goes.
-struct CTRow: View {
-    let category: CTCategory
-    var detail: CTRowDetail = .count
-    var showsChevron = true
-
-    var body: some View {
-        HStack(spacing: 12) {
-            P8CategoryIcon(category: category.icon)
-                .saturation(category.isArchived ? 0 : 1)
-            P8InfoAndAmount {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: category.name)
-                        .font(.body.weight(.medium))
-                        .foregroundStyle(category.isArchived ? .secondary : .primary)
-                    // In lists that mix both types, the type goes under the name.
-                    if detail == .typeAndCount {
-                        Text("\(Text(category.type.title)) · \(CTUsage.count(category))")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                    }
-                }
-            } amount: {
-                if detail == .count {
-                    CTUsage.count(category)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .monospacedDigit()
-                }
-            }
-            if showsChevron {
-                R2Chevron()
-            }
-        }
-        .contentShape(.rect)
-        .accessibilityElement(children: .combine)
-    }
-}
-
-/// "New expense category", at the end of a list.
-struct CTAddRow: View {
-    let type: ExplorationTransactionType
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Label {
-                type == .expense ? Text("New Expense Category") : Text("New Income Category")
-            } icon: {
-                Image(systemName: "plus.circle.fill")
-            }
-            .font(.body.weight(.medium))
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(.rect)
-        }
-        .buttonStyle(.borderless)
-    }
-}
-
-/// Active categories in one tile, each opening the editor. Long press or VoiceOver's actions archive.
-struct CTListTile: View {
-    let title: LocalizedStringKey
-    let symbol: String
-    let categories: [CTCategory]
-    let actions: CTActions
-    var detail: CTRowDetail = .count
-    /// Shows a "New … category" row at the end.
-    var addType: ExplorationTransactionType?
-
-    var body: some View {
-        R2Tile(padding: 18) {
-            VStack(alignment: .leading, spacing: 12) {
-                R2TileHeader(title: title, symbol: symbol) {
-                    Text(categories.count, format: .number)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .monospacedDigit()
-                }
-                ForEach(categories) { category in
-                    Button { actions.edit(category) } label: {
-                        CTRow(category: category, detail: detail)
-                    }
-                    .buttonStyle(.plain)
-                    .ctArchiveMenu(category, actions: actions)
-                    if category.id != categories.last?.id {
-                        Divider()
-                    }
-                }
-                if let addType {
-                    Divider()
-                    CTAddRow(type: addType) { actions.add(addType) }
-                }
-            }
-        }
-    }
-}
-
 extension View {
     /// Edit and Archive (or Unarchive) on long press, and as VoiceOver actions.
     func ctArchiveMenu(_ category: CTCategory, actions: CTActions) -> some View {
@@ -465,74 +345,6 @@ extension View {
         }
         .accessibilityAction(named: category.isArchived ? Text("Unarchive") : Text("Archive")) {
             category.isArchived ? actions.unarchive(category) : actions.archive(category)
-        }
-    }
-}
-
-/// Archived categories, folded away by default, each with Unarchive (CAT-003).
-struct CTArchivedTile: View {
-    let categories: [CTCategory]
-    let actions: CTActions
-    var detail: CTRowDetail = .count
-
-    @State private var isExpanded: Bool
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
-    init(categories: [CTCategory], actions: CTActions, detail: CTRowDetail = .count, startsExpanded: Bool = false) {
-        self.categories = categories
-        self.actions = actions
-        self.detail = detail
-        _isExpanded = State(initialValue: startsExpanded)
-    }
-
-    var body: some View {
-        if !categories.isEmpty {
-            R2Tile(padding: 18) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Button {
-                        withAnimation(reduceMotion ? nil : .snappy) { isExpanded.toggle() }
-                    } label: {
-                        R2TileHeader(title: "Archived", symbol: "archivebox.fill") {
-                            Text(categories.count, format: .number)
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .monospacedDigit()
-                            Image(systemName: "chevron.down")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                                .accessibilityHidden(true)
-                        }
-                        .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityValue(isExpanded ? Text("Expanded") : Text("Collapsed"))
-
-                    if isExpanded {
-                        Text("Archived categories don't show when you add a transaction or in the Plan. Their transactions still show them.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                        ForEach(categories) { category in
-                            let layout = dynamicTypeSize.isAccessibilitySize
-                                ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
-                                : AnyLayout(HStackLayout(spacing: 12))
-                            layout {
-                                Button { actions.edit(category) } label: {
-                                    CTRow(category: category, detail: detail, showsChevron: false)
-                                }
-                                .buttonStyle(.plain)
-                                Button("Unarchive") { actions.unarchive(category) }
-                                    .buttonStyle(.glass)
-                                    .controlSize(.small)
-                            }
-                            if category.id != categories.last?.id {
-                                Divider()
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -622,10 +434,9 @@ final class CTDraft {
     var icon: ExplorationCategory { category.icon }
 }
 
-/// The editor sheet: the variant's layout of the parts, then what the change does, and Archive.
+/// The editor sheet: a tile for each part, then what the change does, and Archive.
 struct CTEditorSheet: View {
     let store: CTStore
-    let style: CTEditorStyle
     let onArchive: (CTCategory) -> Void
     let onUnarchive: (CTCategory) -> Void
 
@@ -635,12 +446,10 @@ struct CTEditorSheet: View {
     init(
         store: CTStore,
         target: CTEditorTarget,
-        style: CTEditorStyle,
         onArchive: @escaping (CTCategory) -> Void,
         onUnarchive: @escaping (CTCategory) -> Void
     ) {
         self.store = store
-        self.style = style
         self.onArchive = onArchive
         self.onUnarchive = onUnarchive
         let draft: CTDraft = switch target {
@@ -654,12 +463,7 @@ struct CTEditorSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: r2TileSpacing) {
-                    switch style {
-                    case .tiles: CTTilesEditor(store: store, draft: draft)
-                    case .studio: SatinStudioEditor(store: store, draft: draft)
-                    case .suggest: PaisleySuggestEditor(store: store, draft: draft)
-                    case .compact: GinghamCompactEditor(store: store, draft: draft)
-                    }
+                    CTTilesEditor(store: store, draft: draft)
                     footer
                 }
                 .padding()
@@ -682,7 +486,7 @@ struct CTEditorSheet: View {
             }
             .environment(\.explorationIconStyle, .soft)
         }
-        .presentationDetents(style == .compact ? [.medium, .large] : [.large])
+        .presentationDetents([.large])
     }
 
     @ViewBuilder
@@ -1042,6 +846,6 @@ struct CTReplacementSheet: View {
 }
 
 #Preview("Categories · Archive with recurring") {
-    CTHost(opening: .archive("subscriptions")) { LinenCategories(store: $0) }
+    CTHost(opening: .archive("subscriptions")) { VelvetCategories(store: $0) }
 }
 #endif
