@@ -5,7 +5,7 @@
 //  FIN-9 Onboarding, Round 1 "Yawl": the brand all the way. Every step sits on Clove's gradient in
 //  white, with glass controls, so onboarding, the lock screen and the app icon feel like one piece.
 //  Steps slide in place under a row of white step dots, with a back button once you're past the
-//  welcome. The currency list opens in a sheet.
+//  welcome. The currency list opens in a sheet. The owner's pick for onboarding.
 //
 
 #if DEBUG
