@@ -1,0 +1,16 @@
+# Xcode user state
+xcuserdata/
+
+# Build output
+build/
+DerivedData/
+
+# macOS
+.DS_Store
+
+# Secrets and signing
+.env
+.env.*
+*.p12
+*.cer
+*.mobileprovision
