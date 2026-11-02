@@ -5,7 +5,8 @@
 //  FIN-9 Onboarding, Round 1 "Yawl": the brand all the way. Every step sits on Clove's gradient in
 //  white, with glass controls, so onboarding, the lock screen and the app icon feel like one piece.
 //  Steps slide in place under a row of white step dots, with a back button once you're past the
-//  welcome. The currency list opens in a sheet. The owner's pick for onboarding.
+//  welcome. The currency list opens in a sheet. The owner's pick for onboarding: the starting balance
+//  can be left empty (zero), and iCloud data that arrives after "Continue as New User" is merged in.
 //
 
 #if DEBUG
@@ -121,7 +122,7 @@ struct YawlOnboarding: View {
         case .balance:
             LKCentered {
                 VStack(spacing: 24) {
-                    YawlHeading(symbol: "banknote.fill", title: Text(OBText.balanceQuestion), message: Text(OBText.balanceHint))
+                    YawlHeading(symbol: "banknote.fill", title: Text(OBText.balanceQuestion), message: Text("Leave it empty to start from zero. You can correct it later in Settings."))
                     OBAmountField(setup: setup, focus: $amountFocused, baseSize: 52, tintsNegative: false)
                     OBOverdrawnToggle(setup: setup)
                         .tint(.green)
@@ -155,7 +156,14 @@ struct YawlOnboarding: View {
                 OBRestoringContent()
             }
         } bottom: {
-            OBSecondaryButton(OBText.newUser, action: setup.continueAsNewUser)
+            VStack(spacing: 10) {
+                OBSecondaryButton(OBText.newUser, action: setup.continueAsNewUser)
+                // ONB-005: what was in iCloud isn't lost by starting over.
+                Text("Your iCloud data is still added when it arrives.")
+                    .font(.footnote)
+                    .opacity(0.8)
+                    .multilineTextAlignment(.center)
+            }
         }
     }
 }
