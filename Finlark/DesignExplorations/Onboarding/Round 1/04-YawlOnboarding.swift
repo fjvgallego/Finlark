@@ -6,7 +6,8 @@
 //  white, with glass controls, so onboarding, the lock screen and the app icon feel like one piece.
 //  Steps slide in place under a row of white step dots, with a back button once you're past the
 //  welcome. The currency list opens in a sheet. The owner's pick for onboarding: the starting balance
-//  can be left empty (zero), and iCloud data that arrives after "Continue as New User" is merged in.
+//  can be left empty (zero), and when iCloud data arrives after "Continue as New User", the person
+//  chooses between it and this setup ("Yawl · iCloud Data Arrives").
 //
 
 #if DEBUG
@@ -159,7 +160,7 @@ struct YawlOnboarding: View {
             VStack(spacing: 10) {
                 OBSecondaryButton(OBText.newUser, action: setup.continueAsNewUser)
                 // ONB-005: what was in iCloud isn't lost by starting over.
-                Text("Your iCloud data is still added when it arrives.")
+                Text("If your iCloud data arrives later, you choose which to keep.")
                     .font(.footnote)
                     .opacity(0.8)
                     .multilineTextAlignment(.center)
@@ -208,5 +209,9 @@ private struct YawlHeading: View {
 
 #Preview("Yawl · Restoring") {
     OBHost(.restoring(arrivesAfter: .seconds(5))) { YawlOnboarding(setup: $0) }
+}
+
+#Preview("Yawl · iCloud Data Arrives") {
+    OBHost(.dataArrivesLater(after: .seconds(3)), step: .balance) { YawlOnboarding(setup: $0) }
 }
 #endif

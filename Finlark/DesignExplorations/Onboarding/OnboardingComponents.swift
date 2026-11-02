@@ -49,6 +49,9 @@ enum OBScenario {
     /// iCloud already has Finlark data. It arrives after the delay, or never, so a preview can stay on
     /// the restoring screen.
     case restoring(arrivesAfter: Duration?)
+    /// Someone continued as a new user while restoring, and the iCloud data arrives after the delay,
+    /// so they choose which to keep (ONB-005).
+    case dataArrivesLater(after: Duration)
 }
 
 @Observable
@@ -70,6 +73,11 @@ final class OBSetup {
     let hasDevicePasscode: Bool
     /// The system's Face ID prompt is up while App Lock is turned on.
     private(set) var isConfirmingLock = false
+
+    /// The iCloud data arrived after "Continue as New User": keep it or this setup (ONB-005).
+    var isChoosingData = false
+    /// Keeping this setup replaces the iCloud data everywhere, so it's confirmed first.
+    var isConfirmingReplace = false
 
     let restoreDelay: Duration?
 
@@ -94,6 +102,11 @@ final class OBSetup {
             restoreDelay = nil
         case .restoring(let delay):
             stage = .restoring
+            biometry = .faceID
+            hasDevicePasscode = true
+            restoreDelay = delay
+        case .dataArrivesLater(let delay):
+            stage = .setup
             biometry = .faceID
             hasDevicePasscode = true
             restoreDelay = delay
@@ -162,6 +175,20 @@ final class OBSetup {
         stage = .setup
     }
 
+    /// Mocked: the real app learns this from CloudKit. While restoring, Home opens with the data. After
+    /// "Continue as New User", the person chooses which to keep.
+    func iCloudDataArrived() {
+        switch stage {
+        case .restoring: stage = .restored
+        case .setup, .finished: isChoosingData = true
+        case .restored: break
+        }
+    }
+
+    func useICloudData() {
+        stage = .restored
+    }
+
     func finish() {
         stage = .finished
     }
@@ -189,7 +216,8 @@ final class OBSetup {
 // MARK: - Host
 
 /// Runs a variant: its restoring screen and steps, then Marsh. The Face ID prompt stand-in shows over
-/// everything while App Lock is turned on.
+/// everything while App Lock is turned on, and the choice between the iCloud data and this setup shows
+/// as system alerts wherever the person is when the data arrives (ONB-005).
 struct OBHost<Flow: View>: View {
     @State private var setup: OBSetup
     private let flow: (OBSetup) -> Flow
@@ -219,12 +247,23 @@ struct OBHost<Flow: View>: View {
         }
         .animation(.smooth(duration: 0.4), value: setup.stage)
         .animation(.smooth(duration: 0.25), value: setup.isConfirmingLock)
+        .alert("Your iCloud Data Is Here", isPresented: $setup.isChoosingData) {
+            Button("Use iCloud Data", action: setup.useICloudData)
+            Button("Keep This Setup") { setup.isConfirmingReplace = true }
+        } message: {
+            Text("Use the Finlark data from your iCloud instead of what you set up on this iPhone, or keep this setup and replace the data in iCloud.")
+        }
+        .alert("Replace Your iCloud Data?", isPresented: $setup.isConfirmingReplace) {
+            // Mocked: the real app deletes the iCloud data and uploads this setup.
+            Button("Replace", role: .destructive) {}
+            Button("Cancel", role: .cancel) { setup.isChoosingData = true }
+        } message: {
+            Text("This deletes the Finlark data in your iCloud and on your other devices, and saves this setup instead. It can't be undone.")
+        }
         .task {
-            guard setup.stage == .restoring, let delay = setup.restoreDelay else { return }
+            guard let delay = setup.restoreDelay else { return }
             try? await Task.sleep(for: delay)
-            if setup.stage == .restoring {
-                setup.stage = .restored
-            }
+            setup.iCloudDataArrived()
         }
     }
 }
