@@ -128,7 +128,7 @@ private struct STDestination: View {
     }
 }
 
-/// Delete All Data sends the app back to onboarding (SEC-003). Onboarding is a later exploration.
+/// Delete All Data sends the app back to onboarding (SEC-003). Yawl isn't wired in here.
 private struct STOnboardingStandIn: View {
     let restart: () -> Void
 
@@ -141,7 +141,7 @@ private struct STOnboardingStandIn: View {
             Button("Bring Back the Sample Data", action: restart)
                 .buttonStyle(.glass)
         }
-        .background { R2Backdrop() }
+        .background { HMBackdrop() }
     }
 }
 
@@ -177,7 +177,7 @@ struct STScreen<Content: View>: View {
         Group {
             if scrolls {
                 ScrollView {
-                    VStack(spacing: r2TileSpacing) {
+                    VStack(spacing: hmTileSpacing) {
                         content(actions)
                     }
                     .padding()
@@ -187,7 +187,7 @@ struct STScreen<Content: View>: View {
                 content(actions)
             }
         }
-        .background { R2Backdrop() }
+        .background { HMBackdrop() }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $editingAccount) {
@@ -215,13 +215,13 @@ struct STPage<Content: View>: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: r2TileSpacing) {
+            VStack(spacing: hmTileSpacing) {
                 content
             }
             .padding()
         }
         .scrollDismissesKeyboard(.interactively)
-        .background { R2Backdrop() }
+        .background { HMBackdrop() }
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -345,7 +345,7 @@ struct STRow<Value: View>: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             if showsChevron {
-                R2Chevron()
+                HMChevron()
             }
         }
         .padding(.vertical, 2)
@@ -709,15 +709,15 @@ struct STAccountSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: r2TileSpacing) {
-                    R2Tile(padding: 18) {
+                VStack(spacing: hmTileSpacing) {
+                    HMTile(padding: 18) {
                         STAccountFields(name: $name, startingBalance: $startingBalance, code: settings.currencyCode)
                     }
                     STStartingBalanceFootnote()
                 }
                 .padding()
             }
-            .background { R2Backdrop() }
+            .background { HMBackdrop() }
             .navigationTitle("Account")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -787,11 +787,11 @@ struct STAccountScreen: View {
 
     var body: some View {
         STPage(title: "Account") {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 STAccountFields(name: $settings.accountName, startingBalance: $settings.startingBalance, code: settings.currencyCode)
             }
             STStartingBalanceFootnote()
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 STLink(route: .currency) {
                     STRow(.currency) {
                         Text(verbatim: settings.currencyCode)
@@ -842,13 +842,13 @@ struct STCurrencyScreen: View {
                 }
             }
             .scrollContentBackground(.hidden)
-            .background { R2Backdrop() }
+            .background { HMBackdrop() }
             .searchable(text: $query, prompt: "Search currencies")
             .navigationTitle("Home Currency")
             .navigationBarTitleDisplayMode(.inline)
         } else {
             STPage(title: "Home Currency") {
-                R2Tile(padding: 18) {
+                HMTile(padding: 18) {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 12) {
                             STIcon(STItem.currency.symbol, color: STItem.currency.color, size: 44)
@@ -893,7 +893,7 @@ struct STNotificationsScreen: View {
 
     var body: some View {
         STPage(title: "Notifications") {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 STNotificationControls(settings: settings)
             }
         }
@@ -905,7 +905,7 @@ struct STSecurityScreen: View {
 
     var body: some View {
         STPage(title: "App Lock") {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 STAppLockControl(settings: settings)
             }
         }
@@ -920,7 +920,7 @@ struct STSyncScreen: View {
 
     var body: some View {
         STPage(title: "iCloud and Data") {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 VStack(alignment: .leading, spacing: 12) {
                     STSyncLabel(settings: settings)
                         .font(.headline)
@@ -929,7 +929,7 @@ struct STSyncScreen: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Deletes everything from this iPhone and from iCloud, so from your other devices too.")
                         .font(.subheadline)
@@ -947,7 +947,7 @@ struct STSyncScreen: View {
 struct STAboutScreen: View {
     var body: some View {
         STPage(title: "About") {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Finlark")
                         .font(.title2.weight(.bold))
@@ -957,7 +957,7 @@ struct STAboutScreen: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 STAboutRows()
             }
         }
@@ -968,7 +968,7 @@ struct STAboutScreen: View {
 struct STAcknowledgementsScreen: View {
     var body: some View {
         STPage(title: "Acknowledgements") {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 Text("Finlark is built with Apple's frameworks only: SwiftUI, SwiftData, CloudKit and Swift Charts. Icons are SF Symbols.")
                     .font(.subheadline)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -989,7 +989,7 @@ struct STDeleteSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: r2TileSpacing) {
+                VStack(alignment: .leading, spacing: hmTileSpacing) {
                     VStack(alignment: .leading, spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.largeTitle)
@@ -1003,9 +1003,9 @@ struct STDeleteSheet: View {
                     }
                     .padding(.horizontal, 4)
 
-                    R2Tile(padding: 18) {
+                    HMTile(padding: 18) {
                         VStack(alignment: .leading, spacing: 10) {
-                            R2TileHeader(title: "What's deleted", symbol: "trash")
+                            HMTileHeader(title: "What's deleted", symbol: "trash")
                             Label("^[\(settings.transactionCount) transaction](inflect: true)", systemImage: "list.bullet")
                             Label("^[\(settings.categories.categories.count) category](inflect: true)", systemImage: STItem.categories.symbol)
                             Label("^[\(settings.recurring.templates.count) recurring template](inflect: true)", systemImage: STItem.recurring.symbol)
@@ -1035,7 +1035,7 @@ struct STDeleteSheet: View {
                 }
                 .padding()
             }
-            .background { R2Backdrop() }
+            .background { HMBackdrop() }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -1043,6 +1043,127 @@ struct STDeleteSheet: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Tiles
+
+/// A glass tile per group, controls inside them, Delete All Data alone at the end. The category icons
+/// and the next recurring item are optional.
+struct STSettingsTiles: View {
+    @Bindable var settings: STSettings
+    var showsCategoryIcons = false
+    var showsNextRecurring = false
+
+    var body: some View {
+        STScreen(settings: settings) { actions in
+            HMTile(padding: 18) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HMTileHeader(title: "Account", symbol: STItem.account.symbol)
+                    Button(action: actions.editAccount) {
+                        STRow(.account, subtitle: STText.startingBalance(settings).monospacedDigit()) {
+                            Text("Edit")
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint(Text("Edits the name and starting balance."))
+                    Divider()
+                    STLink(route: .currency) {
+                        STRow(.currency) {
+                            Text(verbatim: settings.currencyCode)
+                        }
+                    }
+                }
+            }
+
+            HMTile(padding: 18) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HMTileHeader(title: "Organize", symbol: "tray.full.fill")
+                    STLink(route: .categories) {
+                        if showsCategoryIcons {
+                            STCategoriesRow(settings: settings)
+                        } else {
+                            STRow(.categories) {
+                                Text(settings.activeCategoryCount, format: .number)
+                            }
+                        }
+                    }
+                    Divider()
+                    STLink(route: .recurring) {
+                        STRow(.recurring, subtitle: showsNextRecurring ? STText.nextRecurring(settings) : nil) {
+                            Text(settings.recurring.templates.count, format: .number)
+                        }
+                    }
+                }
+            }
+
+            HMTile(padding: 18) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HMTileHeader(title: "Notifications", symbol: STItem.notifications.symbol)
+                    STNotificationControls(settings: settings)
+                }
+            }
+
+            HMTile(padding: 18) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HMTileHeader(title: "Privacy", symbol: "hand.raised.fill")
+                    STAppLockControl(settings: settings)
+                    Divider()
+                    STSyncLabel(settings: settings)
+                    Text(settings.sync.explanation)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            HMTile(padding: 18) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HMTileHeader(title: "About", symbol: STItem.about.symbol)
+                    STAboutRows()
+                }
+            }
+
+            STDeleteButton(action: actions.deleteAll)
+                .padding(.top, 8)
+        }
+    }
+}
+
+/// Categories with the four most used ones under the title. At
+/// accessibility sizes the icons step aside and "17 categories" goes under the title instead.
+struct STCategoriesRow: View {
+    let settings: STSettings
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    var body: some View {
+        HStack(spacing: 12) {
+            if !dynamicTypeSize.isAccessibilitySize {
+                STIcon(STItem.categories.symbol, color: STItem.categories.color)
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                Text(STItem.categories.title)
+                if dynamicTypeSize.isAccessibilitySize {
+                    STText.categories(settings)
+                        .foregroundStyle(.secondary)
+                } else {
+                    HStack(spacing: 4) {
+                        ForEach(settings.leadingCategories.prefix(4)) { category in
+                            CTBadge(symbol: category.symbol, color: category.color, size: 22)
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            if !dynamicTypeSize.isAccessibilitySize {
+                Text(settings.activeCategoryCount, format: .number)
+                    .foregroundStyle(.secondary)
+            }
+            HMChevron()
+        }
+        .padding(.vertical, 2)
+        .contentShape(.rect)
+        .accessibilityElement(children: .combine)
     }
 }
 #endif

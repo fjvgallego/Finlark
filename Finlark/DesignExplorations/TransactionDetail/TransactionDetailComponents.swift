@@ -104,8 +104,8 @@ struct TDScreen<Content: View>: View {
         ScrollView {
             Group {
                 if let editing, editStyle == .inPlace {
-                    VStack(spacing: r2TileSpacing) {
-                        AE2KestrelTiles(draft: editing) {
+                    VStack(spacing: hmTileSpacing) {
+                        AEKestrelTiles(draft: editing) {
                             DunlinCategoryPicker(draft: editing)
                         } split: {
                             DunlinSplitEditor(draft: editing)
@@ -117,7 +117,7 @@ struct TDScreen<Content: View>: View {
                     }
                     .transition(.opacity)
                 } else {
-                    VStack(spacing: r2TileSpacing) {
+                    VStack(spacing: hmTileSpacing) {
                         content
                     }
                     .transition(.opacity)
@@ -126,7 +126,7 @@ struct TDScreen<Content: View>: View {
             .padding()
         }
         .scrollDismissesKeyboard(.interactively)
-        .background { R2Backdrop() }
+        .background { HMBackdrop() }
         .navigationTitle(isEditingInPlace ? Text(editing?.title ?? record.saved.type.editTitle) : Text(record.saved.type.title))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(isEditingInPlace)
@@ -184,7 +184,7 @@ struct TDAmountTile: View {
     @ScaledMetric(relativeTo: .largeTitle) private var size: CGFloat = 46
 
     var body: some View {
-        R2Tile(padding: 18) {
+        HMTile(padding: 18) {
             VStack(spacing: 6) {
                 Label {
                     Text(record.saved.type.title)
@@ -217,9 +217,9 @@ struct TDDetailsTile: View {
     let record: TDRecord
 
     var body: some View {
-        R2Tile {
+        HMTile {
             VStack(alignment: .leading, spacing: 0) {
-                R2TileHeader(title: "Details", symbol: "text.alignleft")
+                HMTileHeader(title: "Details", symbol: "text.alignleft")
                     .padding(.bottom, 4)
                 TDField("Category") {
                     AECategoryLabel(category: record.saved.category)

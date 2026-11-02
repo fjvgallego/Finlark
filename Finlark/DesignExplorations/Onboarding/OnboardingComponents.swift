@@ -562,7 +562,7 @@ struct OBCurrencyList: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .background { R2Backdrop() }
+        .background { HMBackdrop() }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search currencies")
         .navigationTitle("Currency")
         .navigationBarTitleDisplayMode(.inline)

@@ -1,8 +1,8 @@
 //
-//  03-CloveLock.swift
+//  CloveLock.swift
 //  Finlark
 //
-//  FIN-9 Security, Round 1 "Clove": the brand. A full-bleed indigo gradient with the mark and the
+//  FIN-9 Security "Clove": the brand. A full-bleed indigo gradient with the mark and the
 //  Finlark wordmark in white, the same in light and dark. It reads as the app's own front door, and
 //  the app switcher shows it as a clean branded card. The owner's pick: Face ID is asked as soon as the
 //  app opens ("Clove · On Open"), and an iPhone without a passcode opens without asking (SEC-001).

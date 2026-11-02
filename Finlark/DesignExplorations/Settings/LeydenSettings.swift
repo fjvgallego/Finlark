@@ -1,8 +1,8 @@
 //
-//  02-LeydenSettings.swift
+//  LeydenSettings.swift
 //  Finlark
 //
-//  FIN-9 Settings, Round 2 "Leyden": Gouda with the next recurring item under Recurring
+//  FIN-9 Settings "Leyden": a glass tile per group, with the next recurring item under Recurring
 //  ("Veggie box · In 3 days"), so what's coming next is one glance away.
 //
 
@@ -13,7 +13,7 @@ struct LeydenSettings: View {
     @Bindable var settings: STSettings
 
     var body: some View {
-        ST2Gouda(settings: settings, showsNextRecurring: true)
+        STSettingsTiles(settings: settings, showsNextRecurring: true)
     }
 }
 

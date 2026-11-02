@@ -1,8 +1,8 @@
 //
-//  08-TramontanaPlan.swift
+//  TramontanaPlan.swift
 //  Finlark
 //
-//  FIN-9 Plan, Round 1 "Tramontana": the month as a line. A chart follows spending day by day up to
+//  FIN-9 Plan "Tramontana": the month as a line. A chart follows spending day by day up to
 //  today, a dashed line carries on to the projection at month end, and a rule marks the planned total,
 //  so whether the month lands under or over the plan is a shape (PLN-003). The categories follow.
 //
@@ -20,9 +20,9 @@ struct TramontanaPlan: View {
         let report = store.report
 
         ScrollView {
-            VStack(alignment: .leading, spacing: r2TileSpacing) {
+            VStack(alignment: .leading, spacing: hmTileSpacing) {
                 if report.hasPlan {
-                    R2Tile(padding: 18) {
+                    HMTile(padding: 18) {
                         VStack(alignment: .leading, spacing: 14) {
                             VStack(alignment: .leading, spacing: 6) {
                                 PLPaceSentence(report: report, code: code)
@@ -38,9 +38,9 @@ struct TramontanaPlan: View {
                         }
                         .monospacedDigit()
                     }
-                    R2Tile(padding: 18) {
+                    HMTile(padding: 18) {
                         VStack(alignment: .leading, spacing: 14) {
-                            R2TileHeader(title: "Categories", symbol: "square.grid.2x2.fill")
+                            HMTileHeader(title: "Categories", symbol: "square.grid.2x2.fill")
                             ForEach(report.entries) { entry in
                                 PLEntryRow(entry: entry, code: code)
                                 if entry.id != report.entries.last?.id {
@@ -60,7 +60,7 @@ struct TramontanaPlan: View {
             }
             .padding()
         }
-        .background { R2Backdrop() }
+        .background { HMBackdrop() }
         .plChrome(store: store)
     }
 }

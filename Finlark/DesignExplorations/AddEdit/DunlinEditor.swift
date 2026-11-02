@@ -1,11 +1,11 @@
 //
-//  09-DunlinEditor.swift
+//  DunlinEditor.swift
 //  Finlark
 //
-//  FIN-9 Add & edit, Round 2 "Dunlin": Puffin, with the rest of the categories in a thin bar that
-//  expands in place, like Home's Owed to you bar, instead of an "All" button and a search sheet.
-//  The four most used stay on top; a category picked from the bar flies up into the first of those
-//  slots (a matched geometry effect) while the bar folds back. The split is Puffin's: people chips, mode, and the By item table.
+//  FIN-9 Add & edit "Dunlin": the four most used categories stay on top, and the rest sit in a thin bar
+//  that expands in place, like Home's Owed to you bar. A category picked from the bar flies up into the
+//  first of those slots (a matched geometry effect) while the bar folds back. The split has people
+//  chips, the mode, and the By item table.
 //
 
 #if DEBUG
@@ -21,7 +21,7 @@ struct DunlinEditor: View {
     }
 
     var body: some View {
-        AE2KestrelShell(draft: draft, onSave: onSave) {
+        AEKestrelShell(draft: draft, onSave: onSave) {
             DunlinCategoryPicker(draft: draft)
         } split: {
             DunlinSplitEditor(draft: draft)
@@ -29,7 +29,7 @@ struct DunlinEditor: View {
     }
 }
 
-/// People chips, the mode, Puffin's By item table, and the shares.
+/// People chips, the mode, the By item table, and the shares.
 struct DunlinSplitEditor: View {
     @Bindable var draft: AEDraft
 
@@ -38,7 +38,7 @@ struct DunlinSplitEditor: View {
             AEPeoplePicker(draft: draft)
             AESplitModePicker(draft: draft)
             if draft.splitMode == .byItem {
-                PuffinItemTable(draft: draft)
+                AEItemTable(draft: draft)
             }
             VStack(spacing: 12) {
                 AEShareRows(draft: draft)

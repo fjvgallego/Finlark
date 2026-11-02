@@ -1,8 +1,8 @@
 //
-//  03-VelvetCategories.swift
+//  VelvetCategories.swift
 //  Finlark
 //
-//  FIN-9 Categories, Round 1 "Velvet": swatches. Each category is a glass tile in a three-column grid,
+//  FIN-9 Categories "Velvet": swatches. Each category is a glass tile in a three-column grid,
 //  with a big icon, its name and how often it's used, and the last tile adds one. Archived categories
 //  follow in the same grid, gray, with Unarchive on long press. One type at a time.
 //
@@ -18,13 +18,13 @@ struct VelvetCategories: View {
 
     private var columns: [GridItem] {
         let count = dynamicTypeSize.isAccessibilitySize ? 1 : 3
-        return Array(repeating: GridItem(.flexible(), spacing: r2TileSpacing, alignment: .top), count: count)
+        return Array(repeating: GridItem(.flexible(), spacing: hmTileSpacing, alignment: .top), count: count)
     }
 
     var body: some View {
         CTScreen(store: store, addType: type) { actions in
             CTTypeSwitch(selection: $type)
-            LazyVGrid(columns: columns, spacing: r2TileSpacing) {
+            LazyVGrid(columns: columns, spacing: hmTileSpacing) {
                 ForEach(store.active(type)) { category in
                     VelvetSwatch(category: category, actions: actions)
                 }
@@ -34,7 +34,7 @@ struct VelvetCategories: View {
             if !archived.isEmpty {
                 RCSectionTitle(title: "Archived", count: archived.count)
                     .padding(.top, 8)
-                LazyVGrid(columns: columns, spacing: r2TileSpacing) {
+                LazyVGrid(columns: columns, spacing: hmTileSpacing) {
                     ForEach(archived) { category in
                         VelvetSwatch(category: category, actions: actions)
                     }
@@ -56,7 +56,7 @@ private struct VelvetSwatch: View {
 
     var body: some View {
         Button { actions.edit(category) } label: {
-            R2Tile(padding: 8) {
+            HMTile(padding: 8) {
                 VStack(spacing: 8) {
                     CTBadge(symbol: category.symbol, color: category.color, size: 48)
                         .saturation(category.isArchived ? 0 : 1)

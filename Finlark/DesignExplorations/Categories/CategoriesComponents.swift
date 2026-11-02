@@ -157,7 +157,7 @@ struct CTScreen<Content: View>: View {
         Group {
             if scrolls {
                 ScrollView {
-                    VStack(spacing: r2TileSpacing) {
+                    VStack(spacing: hmTileSpacing) {
                         content(actions)
                     }
                     .padding()
@@ -167,7 +167,7 @@ struct CTScreen<Content: View>: View {
                 content(actions)
             }
         }
-        .background { R2Backdrop() }
+        .background { HMBackdrop() }
         .navigationTitle("Categories")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -279,7 +279,7 @@ struct CTTypeSwitch: View {
     @Binding var selection: ExplorationTransactionType
 
     var body: some View {
-        R6SegmentedControl(
+        HMSegmentedControl(
             title: "Type",
             options: [(value: .expense, label: "Expenses"), (value: .income, label: "Income")],
             selection: $selection
@@ -462,14 +462,14 @@ struct CTEditorSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: r2TileSpacing) {
+                VStack(spacing: hmTileSpacing) {
                     CTTilesEditor(store: store, draft: draft)
                     footer
                 }
                 .padding()
             }
             .scrollDismissesKeyboard(.interactively)
-            .background { R2Backdrop() }
+            .background { HMBackdrop() }
             .navigationTitle(draft.isNew ? "New Category" : "Edit Category")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -528,28 +528,28 @@ struct CTTilesEditor: View {
     @Bindable var draft: CTDraft
 
     var body: some View {
-        R2Tile(padding: 18) {
+        HMTile(padding: 18) {
             VStack(spacing: 14) {
                 CTBadge(symbol: draft.symbol, color: draft.color, size: 72)
                     .frame(maxWidth: .infinity)
                 CTNameField(store: store, draft: draft, isProminent: true)
             }
         }
-        R2Tile {
+        HMTile {
             VStack(alignment: .leading, spacing: 12) {
-                R2TileHeader(title: "Type", symbol: "arrow.up.arrow.down")
+                HMTileHeader(title: "Type", symbol: "arrow.up.arrow.down")
                 CTTypeControl(draft: draft)
             }
         }
-        R2Tile {
+        HMTile {
             VStack(alignment: .leading, spacing: 12) {
-                R2TileHeader(title: "Color", symbol: "paintpalette.fill")
+                HMTileHeader(title: "Color", symbol: "paintpalette.fill")
                 CTColorPalette(selection: $draft.color)
             }
         }
-        R2Tile {
+        HMTile {
             VStack(alignment: .leading, spacing: 12) {
-                R2TileHeader(title: "Icon", symbol: "square.grid.2x2.fill")
+                HMTileHeader(title: "Icon", symbol: "square.grid.2x2.fill")
                 CTSymbolPicker(draft: draft)
             }
         }
@@ -594,7 +594,7 @@ struct CTTypeControl: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            R6SegmentedControl(
+            HMSegmentedControl(
                 title: "Type",
                 options: [(value: .expense, label: "Expense"), (value: .income, label: "Income")],
                 selection: $draft.type
@@ -765,7 +765,7 @@ struct CTReplacementSheet: View {
 
         NavigationStack {
             ScrollView {
-                VStack(spacing: r2TileSpacing) {
+                VStack(spacing: hmTileSpacing) {
                     VStack(spacing: 10) {
                         CTBadge(symbol: category.symbol, color: category.color, size: 56)
                         Group {
@@ -785,9 +785,9 @@ struct CTReplacementSheet: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
 
-                    R2Tile(padding: 18) {
+                    HMTile(padding: 18) {
                         VStack(alignment: .leading, spacing: 12) {
-                            R2TileHeader(title: "Recurring", symbol: "repeat")
+                            HMTileHeader(title: "Recurring", symbol: "repeat")
                             ForEach(uses) { use in
                                 let layout = dynamicTypeSize.isAccessibilitySize
                                     ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
@@ -820,7 +820,7 @@ struct CTReplacementSheet: View {
                 }
                 .padding()
             }
-            .background { R2Backdrop() }
+            .background { HMBackdrop() }
             .navigationTitle("Archive Category")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

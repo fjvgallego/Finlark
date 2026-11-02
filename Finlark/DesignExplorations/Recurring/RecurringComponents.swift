@@ -118,7 +118,7 @@ struct RCScreen<Content: View, Pinned: View>: View {
                 RCEmptyState(store: store)
             } else {
                 ScrollView {
-                    VStack(spacing: r2TileSpacing) {
+                    VStack(spacing: hmTileSpacing) {
                         content(actions)
                     }
                     .padding()
@@ -132,7 +132,7 @@ struct RCScreen<Content: View, Pinned: View>: View {
                 }
             }
         }
-        .background { R2Backdrop() }
+        .background { HMBackdrop() }
         .rcChrome(store: store)
         .sheet(item: $reviewing) { RCConfirmSheet(store: store, item: $0) }
     }
@@ -222,7 +222,7 @@ struct RCUndoToastBar: View {
                         store.undo(undo)
                         self.undo = nil
                     }
-                    .buttonStyle(P2ButtonStyle(kind: .tinted))
+                    .buttonStyle(PPButtonStyle(kind: .tinted))
                 }
                 .padding(.leading, 16)
                 .padding(.trailing, 8)
@@ -312,9 +312,9 @@ struct RCTemplateRow: View {
     var body: some View {
         HStack(spacing: 12) {
             if showsIcon {
-                P8CategoryIcon(category: template.category)
+                PPCategoryIcon(category: template.category)
             }
-            P8InfoAndAmount {
+            PPInfoAndAmount {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(verbatim: template.title)
                         .font(.body.weight(.semibold))
@@ -339,7 +339,7 @@ struct RCTemplateRow: View {
                 }
             }
             if showsChevron {
-                R2Chevron()
+                HMChevron()
             }
         }
         .contentShape(.rect)
@@ -355,8 +355,8 @@ struct RCPendingInfo: View {
     var body: some View {
         if let template = store.template(item.templateID) {
             HStack(alignment: .top, spacing: 12) {
-                P8CategoryIcon(category: template.category)
-                P8InfoAndAmount {
+                PPCategoryIcon(category: template.category)
+                PPInfoAndAmount {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(verbatim: template.title)
                             .font(.body.weight(.semibold))
@@ -440,9 +440,9 @@ struct RCTemplateList: View {
 
     var body: some View {
         if !templates.isEmpty {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 VStack(alignment: .leading, spacing: 12) {
-                    R2TileHeader(title: title, symbol: symbol)
+                    HMTileHeader(title: title, symbol: symbol)
                     ForEach(templates) { template in
                         NavigationLink(value: RCRoute.template(template.id)) {
                             RCTemplateRow(store: store, template: template, showsIcon: showsIcon)
@@ -463,7 +463,7 @@ struct RCCaughtUp: View {
     let store: RCStore
 
     var body: some View {
-        R2Tile(padding: 18) {
+        HMTile(padding: 18) {
             HStack(spacing: 14) {
                 Image(systemName: "checkmark.seal.fill")
                     .font(.title2)
@@ -526,23 +526,23 @@ struct RCEditor: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: r2TileSpacing) {
-                    R2Tile(padding: 18) {
+                VStack(spacing: hmTileSpacing) {
+                    HMTile(padding: 18) {
                         VStack(spacing: 16) {
                             AETypePicker(draft: draft)
                             AEAmountField(draft: draft, focus: $isAmountFocused)
                                 .frame(maxWidth: .infinity)
                         }
                     }
-                    R2Tile {
+                    HMTile {
                         VStack(alignment: .leading, spacing: 10) {
-                            R2TileHeader(title: "Category", symbol: "square.grid.2x2.fill")
+                            HMTileHeader(title: "Category", symbol: "square.grid.2x2.fill")
                             DunlinCategoryPicker(draft: draft)
                         }
                     }
-                    R2Tile {
+                    HMTile {
                         VStack(alignment: .leading, spacing: 6) {
-                            R2TileHeader(title: "Note", symbol: "text.alignleft")
+                            HMTileHeader(title: "Note", symbol: "text.alignleft")
                             TextField("Note", text: $draft.note, prompt: Text("Rent, Netflix, Salary…"), axis: .vertical)
                                 .padding(.vertical, 6)
                         }
@@ -571,7 +571,7 @@ struct RCEditor: View {
                 .padding()
             }
             .scrollDismissesKeyboard(.interactively)
-            .background { R2Backdrop() }
+            .background { HMBackdrop() }
             .navigationTitle(original == nil ? "New Recurring" : "Edit Recurring")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -592,10 +592,10 @@ struct RCEditor: View {
     }
 
     private var repeatsTile: some View {
-        R2Tile {
+        HMTile {
             VStack(alignment: .leading, spacing: 12) {
-                R2TileHeader(title: "Repeats", symbol: "repeat")
-                R6SegmentedControl(
+                HMTileHeader(title: "Repeats", symbol: "repeat")
+                HMSegmentedControl(
                     title: "Frequency",
                     options: RCFrequency.allCases.map { (value: $0, label: $0.title) },
                     selection: $frequency
@@ -675,11 +675,11 @@ struct RCConfirmSheet: View {
         NavigationStack {
             if let template = store.template(item.templateID) {
                 ScrollView {
-                    VStack(spacing: r2TileSpacing) {
-                        R2Tile(padding: 18) {
+                    VStack(spacing: hmTileSpacing) {
+                        HMTile(padding: 18) {
                             VStack(spacing: 16) {
                                 HStack(spacing: 12) {
-                                    P8CategoryIcon(category: template.category)
+                                    PPCategoryIcon(category: template.category)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(verbatim: template.title)
                                             .font(.headline)
@@ -694,9 +694,9 @@ struct RCConfirmSheet: View {
                                     .frame(maxWidth: .infinity)
                             }
                         }
-                        R2Tile {
+                        HMTile {
                             VStack(alignment: .leading, spacing: 0) {
-                                R2TileHeader(title: "Details", symbol: "text.alignleft")
+                                HMTileHeader(title: "Details", symbol: "text.alignleft")
                                     .padding(.bottom, 6)
                                 DatePicker("Date", selection: $draft.date, displayedComponents: .date)
                                     .padding(.vertical, 6)
@@ -717,7 +717,7 @@ struct RCConfirmSheet: View {
                 .safeAreaInset(edge: .bottom) {
                     buttons(template)
                 }
-                .background { R2Backdrop() }
+                .background { HMBackdrop() }
                 .navigationTitle("Confirm")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -783,7 +783,7 @@ struct RCTemplateScreen: View {
             )
 
             ScrollView {
-                VStack(spacing: r2TileSpacing) {
+                VStack(spacing: hmTileSpacing) {
                     header(template)
                     pendingTile(template, actions: actions)
                     upcomingTile(template)
@@ -814,7 +814,7 @@ struct RCTemplateScreen: View {
                 .padding()
             }
             .rcUndoToast($undo, store: store)
-            .background { R2Backdrop() }
+            .background { HMBackdrop() }
             .navigationTitle(Text(verbatim: template.title))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -862,9 +862,9 @@ struct RCTemplateScreen: View {
     private func pendingTile(_ template: RCTemplate, actions: RCActions) -> some View {
         let items = store.pending(for: template)
         if !items.isEmpty {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 VStack(alignment: .leading, spacing: 14) {
-                    R2TileHeader(title: "Pending", symbol: "clock.badge.exclamationmark.fill")
+                    HMTileHeader(title: "Pending", symbol: "clock.badge.exclamationmark.fill")
                     ForEach(items) { item in
                         VStack(alignment: .leading, spacing: 12) {
                             Button { actions.review(item) } label: {
@@ -884,9 +884,9 @@ struct RCTemplateScreen: View {
     }
 
     private func upcomingTile(_ template: RCTemplate) -> some View {
-        R2Tile(padding: 18) {
+        HMTile(padding: 18) {
             VStack(alignment: .leading, spacing: 12) {
-                R2TileHeader(title: "Coming up", symbol: "calendar")
+                HMTileHeader(title: "Coming up", symbol: "calendar")
                 if template.isPaused {
                     Text("Paused. Nothing becomes pending until you resume it.")
                         .foregroundStyle(.secondary)
@@ -914,9 +914,9 @@ struct RCTemplateScreen: View {
     private func historyTile(_ template: RCTemplate) -> some View {
         let history = store.history(for: template).prefix(6)
         if !history.isEmpty {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 VStack(alignment: .leading, spacing: 12) {
-                    R2TileHeader(title: "Earlier", symbol: "clock.arrow.circlepath")
+                    HMTileHeader(title: "Earlier", symbol: "clock.arrow.circlepath")
                     ForEach(history) { outcome in
                         HStack {
                             RCFormat.day(outcome.occurrence)
@@ -954,5 +954,122 @@ struct RCTemplateScreen: View {
 
 #Preview("Recurring · Template") {
     RCHost(opensTemplate: true) { RCScreen(store: $0) { _ in EmptyView() } }
+}
+
+// MARK: - Headers
+
+/// The header: what goes out each month, large, and what comes in. Optionally a line with what's
+/// waiting to be confirmed.
+struct RCMonthlyHeader: View {
+    let store: RCStore
+    var showsPending = false
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(store.monthlyTotal(.expense), format: .currency(code: store.code))
+                .font(.largeTitle.weight(.bold))
+                .monospacedDigit()
+            Text("goes out each month")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Text("\(store.monthlyTotal(.income), format: .currency(code: store.code)) comes in")
+                .font(.subheadline.weight(.medium))
+                .monospacedDigit()
+                .padding(.top, 4)
+            if showsPending, !store.pending.isEmpty {
+                Label {
+                    Text("\(store.pendingTotal, format: .currency(code: store.code).sign(strategy: .always())) waiting to be confirmed")
+                        .monospacedDigit()
+                } icon: {
+                    Image(systemName: "clock.badge.exclamationmark.fill")
+                        .foregroundStyle(.orange)
+                }
+                .font(.footnote.weight(.semibold))
+                .padding(.top, 6)
+            }
+        }
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+// MARK: - Pending slider
+
+/// "Pending 4" with the total trailing, over the slider.
+struct RCPendingTitle: View {
+    let store: RCStore
+    var title: LocalizedStringKey = "Pending"
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    var body: some View {
+        // At accessibility sizes the total moves under the title, so the title keeps its line.
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 2))
+            : AnyLayout(HStackLayout(alignment: .firstTextBaseline))
+        layout {
+            RCSectionTitle(title: title, count: store.pending.count)
+            if !dynamicTypeSize.isAccessibilitySize {
+                Spacer(minLength: 8)
+            }
+            Text(store.pendingTotal, format: .currency(code: store.code).sign(strategy: .always()))
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+                .padding(.horizontal, 4)
+                .accessibilityLabel(Text("Total \(store.pendingTotal.formatted(.currency(code: store.code)))"))
+        }
+    }
+}
+
+/// A paged slider, bleeding to the screen edges so the cards line up with the tiles.
+struct RCSlider<Item: Identifiable, Card: View>: View {
+    let items: [Item]
+    var peeksNextPage = false
+    @ViewBuilder let card: (Item) -> Card
+
+    var body: some View {
+        HMSlider(items, peeksNextPage: peeksNextPage) { item in
+            card(item)
+        }
+        .padding(.horizontal, -16)
+    }
+}
+
+/// A card: the item, then wide Skip and Confirm. Tapping the item opens it to change first.
+struct RCPendingCard: View {
+    let store: RCStore
+    let item: RCPending
+    let actions: RCActions
+
+    var body: some View {
+        HMTile(padding: 14) {
+            VStack(alignment: .leading, spacing: 12) {
+                RCReviewButton(item: item, actions: actions) {
+                    RCPendingInfo(store: store, item: item)
+                }
+                Spacer(minLength: 0)
+                RCPendingButtons(store: store, item: item, actions: actions)
+            }
+        }
+    }
+}
+
+/// Opens the confirm screen to change the amount, date or note first (REC-003).
+struct RCReviewButton<Label: View>: View {
+    let item: RCPending
+    let actions: RCActions
+    @ViewBuilder let label: Label
+
+    var body: some View {
+        Button { actions.review(item) } label: {
+            label
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(Text("Opens it to change the amount, date or note before confirming."))
+    }
 }
 #endif

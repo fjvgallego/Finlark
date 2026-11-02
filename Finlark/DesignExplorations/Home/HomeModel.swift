@@ -1,8 +1,8 @@
 //
-//  HomeExplorationData.swift
+//  HomeModel.swift
 //  Finlark
 //
-//  FIN-9: shared mock data and building blocks for the Home screen explorations.
+//  FIN-9 Home: mock data and the basic building blocks every flow shares, such as category icons.
 //  Throwaway design code: not wired into the app, compiled in Debug only.
 //
 

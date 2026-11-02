@@ -60,7 +60,7 @@ struct PLHost<Plan: View>: View {
             }
             Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {
                 NavigationStack {
-                    R2SettingsScreen()
+                    HMSettingsScreen()
                 }
             }
         }
@@ -147,7 +147,7 @@ struct PLStatusLabel: View {
     }
 }
 
-/// The plan in one sentence, from Slate and Marsh's plan tile.
+/// The plan in one sentence, as on Marsh's plan tile.
 struct PLPaceSentence: View {
     let report: PLReport
     let code: String
@@ -192,13 +192,13 @@ struct PLFigures: View {
 
     @ViewBuilder
     private func figures(spacer: Bool) -> some View {
-        R3PlanFigure(title: "Spent", value: spent, code: code, swatch: .spent(tint))
+        HMPlanFigure(title: "Spent", value: spent, code: code, swatch: .spent(tint))
         if let projected {
             if spacer { Spacer(minLength: 8) }
-            R3PlanFigure(title: "Projected", value: projected, code: code, swatch: .projected(tint))
+            HMPlanFigure(title: "Projected", value: projected, code: code, swatch: .projected(tint))
         }
         if spacer { Spacer(minLength: 8) }
-        R3PlanFigure(title: "Planned", value: planned, code: code, swatch: .planned)
+        HMPlanFigure(title: "Planned", value: planned, code: code, swatch: .planned)
     }
 }
 
@@ -371,9 +371,9 @@ struct PLUnplannedTile: View {
 
     var body: some View {
         if !report.unplanned.isEmpty {
-            R2Tile(padding: 18) {
+            HMTile(padding: 18) {
                 VStack(alignment: .leading, spacing: 12) {
-                    R2TileHeader(title: "Unplanned", symbol: "questionmark.square.dashed") {
+                    HMTileHeader(title: "Unplanned", symbol: "questionmark.square.dashed") {
                         Text(report.unplannedSpent, format: .currency(code: code))
                             .font(.subheadline.weight(.semibold))
                             .monospacedDigit()
@@ -396,7 +396,7 @@ struct PLInvite: View {
     @State private var isEditing = false
 
     var body: some View {
-        R2Tile(padding: 20) {
+        HMTile(padding: 20) {
             VStack(alignment: .leading, spacing: 12) {
                 Image(systemName: "chart.bar.doc.horizontal.fill")
                     .font(.title)

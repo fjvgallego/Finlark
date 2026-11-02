@@ -1,8 +1,8 @@
 //
-//  03-BirchDetail.swift
+//  BirchDetail.swift
 //  Finlark
 //
-//  FIN-9 Transaction detail, Round 1 "Birch": the split tile stays short, one line per friend with a
+//  FIN-9 Transaction detail "Birch": the split tile stays short, one line per friend with a
 //  ring that fills as they pay. Tapping someone opens their own sheet: the ring large, their
 //  repayments as a list you can swipe (Edit, Delete), and Mark as paid and Record part at the bottom.
 //  Edit turns the tiles into Dunlin's fields in place.
@@ -22,9 +22,9 @@ struct BirchDetail: View {
             TDAmountTile(record: record)
             TDDetailsTile(record: record)
             if record.isSplit {
-                R2Tile {
+                HMTile {
                     VStack(alignment: .leading, spacing: 12) {
-                        R2TileHeader(title: "Split", symbol: "person.2.fill")
+                        HMTileHeader(title: "Split", symbol: "person.2.fill")
                         TDSplitFigures(record: record)
                         if record.saved.splitMode == .byItem {
                             Divider()
@@ -59,7 +59,7 @@ struct BirchDetail: View {
                         .fontWeight(.medium)
                         .monospacedDigit()
                 }
-                R2Chevron()
+                HMChevron()
             }
             .contentShape(.rect)
         }

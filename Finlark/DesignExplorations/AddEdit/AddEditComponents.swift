@@ -218,7 +218,7 @@ struct AETypePicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            R6SegmentedControl(
+            HMSegmentedControl(
                 title: "Type",
                 options: [(value: .expense, label: "Expense"), (value: .income, label: "Income")],
                 selection: $draft.type
@@ -470,7 +470,7 @@ struct AESplitModePicker: View {
     @Bindable var draft: AEDraft
 
     var body: some View {
-        R6SegmentedControl(
+        HMSegmentedControl(
             title: "Split mode",
             options: AESplitMode.allCases.map { (value: $0, label: $0.title) },
             selection: $draft.splitMode
@@ -745,6 +745,173 @@ struct AEFlowLayout: Layout {
             y += height + lineSpacing
         }
         return (frames, CGSize(width: widest, height: max(y - lineSpacing, 0)))
+    }
+}
+
+// MARK: - Editor shell
+
+struct AEKestrelShell<CategoryControl: View, SplitControl: View>: View {
+    @Bindable var draft: AEDraft
+    /// Runs before Save dismisses.
+    var onSave: (() -> Void)?
+    @ViewBuilder var category: CategoryControl
+    /// Shown in the split tile while the split is on.
+    @ViewBuilder var split: SplitControl
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                AEKestrelTiles(draft: draft) { category } split: { split }
+                    .padding()
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .background { HMBackdrop() }
+            .aeEditorChrome(draft, onSave: onSave)
+        }
+    }
+}
+
+/// The shell's tiles without the screen around them, so the transaction detail can switch into them
+/// in place when editing.
+struct AEKestrelTiles<CategoryControl: View, SplitControl: View>: View {
+    @Bindable var draft: AEDraft
+    @ViewBuilder var category: CategoryControl
+    @ViewBuilder var split: SplitControl
+
+    @FocusState private var isAmountFocused: Bool
+
+    var body: some View {
+        VStack(spacing: hmTileSpacing) {
+            HMTile(padding: 18) {
+                VStack(spacing: 16) {
+                    AETypePicker(draft: draft)
+                    AEAmountField(draft: draft, focus: $isAmountFocused)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+
+            HMTile {
+                VStack(alignment: .leading, spacing: 10) {
+                    HMTileHeader(title: "Category", symbol: "square.grid.2x2.fill")
+                    category
+                }
+            }
+
+            HMTile {
+                VStack(alignment: .leading, spacing: 0) {
+                    HMTileHeader(title: "Details", symbol: "text.alignleft")
+                        .padding(.bottom, 6)
+                    DatePicker("Date", selection: $draft.date, displayedComponents: .date)
+                        .padding(.vertical, 6)
+                    Divider()
+                    TextField("Note", text: $draft.note, prompt: Text("Note (optional)"), axis: .vertical)
+                        .padding(.vertical, 12)
+                }
+            }
+
+            if draft.type == .expense {
+                HMTile {
+                    VStack(alignment: .leading, spacing: 14) {
+                        Toggle(isOn: $draft.isSplit.animation()) {
+                            Label("Split with friends", systemImage: "person.2.fill")
+                                .font(.headline)
+                        }
+                        if draft.isSplit {
+                            split
+                        } else {
+                            Text("For an expense you paid that others owe you part of.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+
+            if draft.purpose == .add, draft.total > 0 {
+                HMTile {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HMTileHeader(title: "When you save", symbol: "sparkles")
+                        AEImpactSummary(draft: draft)
+                    }
+                }
+            }
+        }
+        .onAppear { isAmountFocused = draft.purpose == .add }
+    }
+}
+
+// MARK: - By item table
+
+/// Items as rows and people as columns; a tap toggles who had what. At accessibility sizes it falls
+/// back to the list of items with people chips.
+struct AEItemTable: View {
+    @Bindable var draft: AEDraft
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric private var column: CGFloat = 34
+
+    var body: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 10) {
+                AEItemRows(draft: draft, isCarded: true)
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 10) {
+                Grid(alignment: .leading, horizontalSpacing: 6, verticalSpacing: 10) {
+                    GridRow {
+                        Text("Item")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .gridColumnAlignment(.leading)
+                        ForEach(draft.everyone) { person in
+                            // Hidden from VoiceOver: each check is labeled with the item and the person.
+                            AEAvatar(person: person, size: 26)
+                                .frame(width: column)
+                        }
+                    }
+                    Divider()
+                    ForEach($draft.items) { $item in
+                        GridRow {
+                            VStack(alignment: .leading, spacing: 4) {
+                                TextField("Item", text: $item.name, prompt: Text("Item"))
+                                AEMoneyField(title: "Item amount", text: $item.amountText, draft: draft)
+                                    .font(.subheadline)
+                            }
+                            ForEach(draft.everyone) { person in
+                                check(item: item, person: person)
+                            }
+                        }
+                        .contextMenu {
+                            if draft.items.count > 1 {
+                                Button("Remove item", systemImage: "trash", role: .destructive) {
+                                    draft.removeItem(item.id)
+                                }
+                            }
+                        }
+                    }
+                }
+                Button("Add item", systemImage: "plus.circle.fill") { draft.addItem() }
+                Text("Touch and hold an item to remove it. Items with no one ticked count as yours.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func check(item: AESplitItem, person: AEPerson) -> some View {
+        let isAssigned = item.assignees.contains(person.id)
+        return Button {
+            draft.toggle(person, on: item.id)
+        } label: {
+            Image(systemName: isAssigned ? "checkmark.square.fill" : "square")
+                .font(.title3)
+                .foregroundStyle(isAssigned ? AnyShapeStyle(person.color) : AnyShapeStyle(.tertiary))
+                .frame(width: column, height: column)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("\(item.name.isEmpty ? String(localized: "Item") : item.name), \(person.isMe ? String(localized: "You") : person.name)"))
+        .accessibilityAddTraits(isAssigned ? .isSelected : [])
     }
 }
 #endif

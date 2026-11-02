@@ -1,8 +1,8 @@
 //
-//  06-FinancierPeople.swift
+//  FinancierPerson.swift
 //  Finlark
 //
-//  FIN-9 People, Round 9 "Financier": Settle All pinned in a glass bar that also says what's open
+//  FIN-9 People "Financier": Settle All pinned in a glass bar that also says what's open
 //  and across how many shares, so the total stays visible while scrolling. Add Repayment in plain
 //  glass, Mark as Paid in blue glass.
 //
@@ -15,7 +15,7 @@ struct FinancierPerson: View {
     let id: PPPerson.ID
 
     var body: some View {
-        P9PersonScreen(store: store, id: id, settlePlacement: .pinned, settleLook: .summaryBar, buttonPair: .secondaryAndPrimary)
+        PPPersonScreen(store: store, id: id, settlePlacement: .pinned, settleLook: .summaryBar, buttonPair: .secondaryAndPrimary)
     }
 }
 

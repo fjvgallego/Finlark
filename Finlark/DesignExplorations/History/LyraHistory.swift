@@ -1,11 +1,11 @@
 //
-//  01-LyraHistory.swift
+//  LyraHistory.swift
 //  Finlark
 //
-//  FIN-9 History, Round 2 "Lyra": Deneb's sections with plain rows. Every month in one scroll; each
-//  month's glass bar pins to the top with its difference, income and spending. The only glass is that
-//  bar and the chips. Picking a month in the title's menu narrows to it and names it in the title;
-//  All months, in the same menu, goes back. The chips are only for type and categories.
+//  FIN-9 History "Lyra": sections with plain rows. Every month in one scroll; each month's glass bar
+//  pins to the top with its difference, income and spending. The only glass is that bar and the chips.
+//  Picking a month in the title's menu narrows to it and names it in the title; All months, in the same
+//  menu, goes back. The chips are only for type and categories.
 //
 
 #if DEBUG
@@ -23,21 +23,21 @@ struct LyraHistory: View {
                 alignment: .leading, spacing: 0,
                 pinnedViews: dynamicTypeSize.isAccessibilitySize ? [] : [.sectionHeaders]
             ) {
-                HY2FilterChips(store: store)
+                HYFilterChips(store: store)
                     .padding(.bottom, 8)
 
                 ForEach(store.monthGroups) { group in
                     Section {
                         VStack(spacing: 20) {
                             ForEach(group.days) { day in
-                                HY2PlainDay(day: day, code: store.code)
+                                HYPlainDay(day: day, code: store.code)
                             }
                         }
                         .padding(.horizontal, 20)
                         .padding(.top, 12)
                         .padding(.bottom, 24)
                     } header: {
-                        HY2MonthBar(group: group, code: store.code, type: store.type)
+                        HYMonthBar(group: group, code: store.code, type: store.type)
                             .padding(.horizontal)
                             .padding(.vertical, 4)
                     }
@@ -50,13 +50,13 @@ struct LyraHistory: View {
             }
             .padding(.vertical, 8)
         }
-        .background { R2Backdrop() }
+        .background { HMBackdrop() }
         .overlay {
             if store.records.isEmpty {
                 HYEmptyView(store: store)
             }
         }
-        .hy2Chrome(store: store, allowsAllMonths: true)
+        .hyChrome(store: store, allowsAllMonths: true)
     }
 }
 
