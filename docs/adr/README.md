@@ -9,3 +9,5 @@ How ADRs are written: [ADR-0001](0001-record-architecture-decisions.md).
 | [0003](0003-module-structure.md) | Module structure | Accepted |
 | [0004](0004-sync-duplicates.md) | Avoiding duplicates when iCloud syncs | Accepted |
 | [0005](0005-money-storage.md) | How amounts are stored | Accepted |
+| [0006](0006-concurrency.md) | Concurrency | Accepted |
+| [0007](0007-testing-strategy.md) | Testing strategy | Accepted |
