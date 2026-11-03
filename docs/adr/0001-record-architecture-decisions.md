@@ -15,7 +15,8 @@ decided, why, and what was rejected. The docs are the source of truth and live n
 - Every architecture, data model or dependency decision gets an ADR.
 - An ADR has a status line and these sections: Context, Options considered, Decision, Consequences. It cites the
   requirement IDs it serves (`NFR-011`, `A-12`…) and the ticket that produced it.
-- Statuses: *Proposed*, *Accepted*, *Superseded by ADR-NNNN*, *Deprecated*. An accepted ADR isn't rewritten when the
+- Statuses: *Proposed*, *Accepted*, *Superseded by ADR-NNNN*, *Deprecated*.
+- An ADR can be edited freely until it's merged into `main`. After that, an accepted ADR isn't rewritten when the
   decision changes. A new ADR supersedes it, and the old one only gets its status updated. Fixing typos and links is
   fine.
 - [README.md](README.md) lists every ADR with its status.

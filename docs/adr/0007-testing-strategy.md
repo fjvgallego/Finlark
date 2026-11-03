@@ -25,7 +25,8 @@ Option 2, in three layers:
 
 | Layer | What it covers | How |
 |---|---|---|
-| Domain unit tests | Every rule: balance, spending, split shares and rounding, repayment limits, projection, recurrence dates, minor-unit conversion | Swift Testing, parameterized where cases repeat |
+| Domain unit tests | Every rule: balance, spending, periods, split shares and rounding, repayment limits, projection, recurrence dates, minor-unit conversion, which notifications should exist | Swift Testing, parameterized where cases repeat |
+| Draft and router tests | Drafts' validation and what they pass to use cases; which tab and path a route opens | Swift Testing, no views |
 | Persistence integration tests | Use cases (rules enforced, one save per action), the duplicate cleanup step, schema migrations, money round trips | Swift Testing on an in-memory `ModelContainer` with the real schema, no CloudKit |
 | UI smoke tests | Onboarding, add an expense, split and record a repayment, confirm a pending item | XCUITest, with the app launched on an in-memory store and fixed data |
 

@@ -26,7 +26,7 @@ Option 1:
 
 - Every module and the app target use the Swift 6 language mode, with the features that Xcode's Approachable
   Concurrency setting turns on.
-- `Persistence`, `DesignSystem`, `Features` and the app target default to `MainActor` isolation.
+- `Persistence`, `Services`, `DesignSystem`, `Features` and the app target default to `MainActor` isolation.
 - `Domain` has no default isolation. Its types are `Sendable` and its functions are synchronous and pure.
 - Use cases run on the main actor with the main `ModelContext`, which keeps one save per user action simple
   (NFR-012). App Intents (v2.0) call them the same way (NFR-011).
