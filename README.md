@@ -3,7 +3,7 @@ Personal finance app for iOS built to production standards: modular SwiftUI arch
 
 ## Documentation
 
-See [docs/](docs/README.md): vision, requirements, roadmap and glossary.
+See [docs/](docs/README.md): vision, requirements, roadmap, glossary, architecture and ADRs.
 
 ## License
 

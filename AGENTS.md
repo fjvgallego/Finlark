@@ -14,5 +14,9 @@ Product documentation lives in [docs/](docs/README.md) and is the source of trut
 - For these, present 2–3 options with trade-offs and a recommendation, then wait for an answer.
 - Decide everything else yourself and list those choices in your summary.
 
+### Architecture
+- Before writing or changing code, read [docs/architecture.md](docs/architecture.md) and follow its rules.
+- Changing the architecture needs an [ADR](docs/adr/README.md) approved by the owner.
+
 ### Security
 - This repository is **public**. Never commit secrets, API keys, certificates, provisioning profiles or personal data.

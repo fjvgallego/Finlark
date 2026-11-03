@@ -20,6 +20,8 @@ decided, why, and what was rejected. The docs are the source of truth and live n
   decision changes. A new ADR supersedes it, and the old one only gets its status updated. Fixing typos and links is
   fine.
 - [README.md](README.md) lists every ADR with its status.
+- [architecture.md](../architecture.md) describes the current architecture and links to the ADRs behind it. An ADR
+  that changes the architecture updates that page in the same commit.
 
 ### Template
 
