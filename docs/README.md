@@ -9,13 +9,13 @@ change in the same commits as the code they describe.
 | [glossary.md](glossary.md) | Domain terms used across docs, code and tickets |
 | [requirements/v1.md](requirements/v1.md) | v1.0 scope: functional and non-functional requirements, out of scope, assumptions |
 | [roadmap.md](roadmap.md) | Planned releases after v1.0 and their dependencies |
+| [adr/](adr/README.md) | Architecture Decision Records |
 
 ## Coming next
 
 Created when their step starts, not before:
 
 - `docs/design/`: main screens and flows.
-- `docs/adr/`: Architecture Decision Records.
 - `docs/technical/`: workflow, coding style, testing, and CI and security rules.
 
 ## Conventions
