@@ -12,6 +12,7 @@ change in the same commits as the code they describe.
 | [architecture.md](architecture.md) | How Finlark is built: modules, data flow, services, navigation, rules |
 | [adr/](adr/README.md) | Architecture Decision Records: why the architecture is the way it is |
 | [technical/coding-style.md](technical/coding-style.md) | How Swift is written: design principles, functional style, formatting, naming, SwiftUI, localization, accessibility, logging, tests |
+| [technical/git-workflow.md](technical/git-workflow.md) | Branches, commits, review before committing, pull requests and their descriptions, merging |
 
 ## Coming next
 

@@ -21,5 +21,10 @@ Product documentation lives in [docs/](docs/README.md) and is the source of trut
 ### Coding style
 - Write Swift following [docs/technical/coding-style.md](docs/technical/coding-style.md).
 
+### Git
+- Follow [docs/technical/git-workflow.md](docs/technical/git-workflow.md).
+- Never commit until the owner has reviewed the changes and asked for a commit.
+- Push and open a pull request only when the owner asks, after they've reviewed its title and description. Never merge.
+
 ### Security
 - This repository is **public**. Never commit secrets, API keys, certificates, provisioning profiles or personal data.
