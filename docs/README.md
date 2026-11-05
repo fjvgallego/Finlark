@@ -11,13 +11,14 @@ change in the same commits as the code they describe.
 | [roadmap.md](roadmap.md) | Planned releases after v1.0 and their dependencies |
 | [architecture.md](architecture.md) | How Finlark is built: modules, data flow, services, navigation, rules |
 | [adr/](adr/README.md) | Architecture Decision Records: why the architecture is the way it is |
+| [technical/coding-style.md](technical/coding-style.md) | How Swift is written: design principles, functional style, formatting, naming, SwiftUI, localization, accessibility, logging, tests |
 
 ## Coming next
 
 Created when their step starts, not before:
 
 - `docs/design/`: main screens and flows.
-- `docs/technical/`: workflow, coding style, testing, and CI and security rules.
+- More of `docs/technical/`: workflow, testing, and CI and security rules.
 
 ## Conventions
 

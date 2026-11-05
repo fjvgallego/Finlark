@@ -18,5 +18,8 @@ Product documentation lives in [docs/](docs/README.md) and is the source of trut
 - Before writing or changing code, read [docs/architecture.md](docs/architecture.md) and follow its rules.
 - Changing the architecture needs an [ADR](docs/adr/README.md) approved by the owner.
 
+### Coding style
+- Write Swift following [docs/technical/coding-style.md](docs/technical/coding-style.md).
+
 ### Security
 - This repository is **public**. Never commit secrets, API keys, certificates, provisioning profiles or personal data.
