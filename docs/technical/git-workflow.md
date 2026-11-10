@@ -25,7 +25,8 @@ pull request.
 
 Agents don't commit on their own:
 
-1. When the work is ready, the agent leaves it uncommitted and summarizes the changes and the decisions it made.
+1. When the work is ready, the agent leaves it uncommitted, runs the [`ready`](../../.claude/skills/ready/SKILL.md)
+   skill and summarizes the changes, the decisions it made and the review results.
 2. The owner reviews the diff.
 3. The agent commits only when the owner asks, using a message the owner has seen.
 

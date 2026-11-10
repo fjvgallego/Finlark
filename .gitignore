@@ -14,3 +14,7 @@ DerivedData/
 *.p12
 *.cer
 *.mobileprovision
+
+# Local agent settings and notes
+.claude/settings.local.json
+CLAUDE.local.md

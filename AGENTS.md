@@ -21,6 +21,11 @@ Product documentation lives in [docs/](docs/README.md) and is the source of trut
 ### Coding style
 - Write Swift following [docs/technical/coding-style.md](docs/technical/coding-style.md).
 
+### Review
+- Before handing a change to the owner, run the [`ready`](.claude/skills/ready/SKILL.md) skill and include its results
+  in the summary. Skip it only when the owner says so.
+- Tools that lack the `ready` skill or the review agents say in the summary that the review didn't run.
+
 ### Git
 - Follow [docs/technical/git-workflow.md](docs/technical/git-workflow.md).
 - Never commit until the owner has reviewed the changes and asked for a commit.
