@@ -11,7 +11,8 @@ checklist for applying them.
 ## 1. Check that the owner asked
 
 Agents never commit on their own. Go ahead only if the owner asked for a commit in this conversation, after reviewing
-the changes. If they didn't, stop, summarize the changes and the decisions you made, and wait.
+the changes. If they didn't, stop and hand the change over as
+[git-workflow.md](../../../docs/technical/git-workflow.md#review-before-committing) describes.
 
 ## 2. Check the branch and the tree
 

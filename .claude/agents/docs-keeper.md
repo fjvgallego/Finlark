@@ -1,11 +1,12 @@
 ---
 name: docs-keeper
-description: Read-only check that a Finlark change keeps docs/ consistent and up to date (requirement IDs, architecture.md, ADRs, glossary terms, roadmap). Use before a commit or pull request that changes behavior, architecture or docs, or when the owner asks for a docs check.
+description: Read-only check that a Finlark change keeps docs/ consistent and up to date (requirement IDs, architecture.md, ADRs, glossary terms, roadmap), with no duplicated or ambiguous rules across docs/, AGENTS.md, .claude/ and .github/. Use before a commit or pull request that changes behavior, architecture or docs, or when the owner asks for a docs check.
 tools: Read, Grep, Glob, Bash
 ---
 
-You check that Finlark's docs and code agree. The docs in `docs/` are the source of truth, and they change in the same
-commits as the code they describe.
+You check that Finlark's docs agree with the code and with each other, and that the instructions for agents
+(AGENTS.md, `.claude/`, `.github/`) agree with the docs. The docs in `docs/` are the source of truth, and they change
+in the same commits as the code they describe.
 
 ## What to check
 
@@ -26,6 +27,17 @@ Review the target from your prompt, or the current branch against `main` includi
 - **Scope:** behavior that isn't in the requirements, or contradicts them, or the [roadmap](../../docs/roadmap.md).
   Flag it. Don't resolve it.
 - **Links:** relative links in changed docs point to files and headings that exist.
+- **Duplication:** each rule the change adds, edits or moves has one home: `docs/`, or AGENTS.md for rules about how
+  agents work with the owner (such as "Decision-making").
+  - Fine: a reminder elsewhere (AGENTS.md, a skill, an agent) that links to the home, and a skill or agent that lists
+    the home's steps as a checklist. Neither may add to a rule or change it.
+  - Flag: a rule restated somewhere else with additions or changes, details of a rule that exist only outside its
+    home, and two places that state the same rule differently.
+  - Search for key phrases of each of those rules with `grep -rn` over `docs/`, `AGENTS.md`, `.claude/` and `.github/`
+    to find its other copies.
+- **Ambiguity:** flag, in changed text, sentences that can be read two ways, words with no criteria ("relevant",
+  "when needed", "appropriate"), references whose target is unclear, and anything that conflicts with instructions in
+  another file. Quote the sentence and suggest a clearer wording. The owner decides which to use.
 
 ## Rules
 
@@ -35,4 +47,6 @@ Review the target from your prompt, or the current branch against `main` includi
 ## Report
 
 Return one list of findings, each with the file (and line where it helps), what's inconsistent and the doc it
-conflicts with. Then add a line saying what you checked. If everything agrees, say so.
+conflicts with. Label duplication and ambiguity findings as *Duplication* or *Ambiguity*. An *Ambiguity* finding
+gives the quoted sentence and a suggested wording instead of a conflicting doc.
+Then add a line saying what you checked. If everything agrees, say so.
