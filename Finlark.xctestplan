@@ -1,0 +1,31 @@
+{
+  "configurations" : [
+    {
+      "id" : "5C0E5A4E-6C1B-4B8E-9A55-0F1D2C3B4A12",
+      "name" : "Default",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/FinlarkKit",
+        "identifier" : "DomainTests",
+        "name" : "DomainTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/FinlarkKit",
+        "identifier" : "PersistenceTests",
+        "name" : "PersistenceTests"
+      }
+    }
+  ],
+  "version" : 1
+}

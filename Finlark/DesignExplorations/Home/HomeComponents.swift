@@ -434,9 +434,11 @@ struct HMTabShell<Home: View>: View {
             }
         }
         .tabBarMinimizeBehavior(.onScrollDown)
-        .tabViewBottomAccessory(isEnabled: quickAdd.usesAccessory && selection != .settings) {
-            HMQuickAddAccessory(model: model, quickAdd: quickAdd)
-        }
+        .modifier(
+            HMBottomAccessory(isEnabled: quickAdd.usesAccessory && selection != .settings) {
+                HMQuickAddAccessory(model: model, quickAdd: quickAdd)
+            }
+        )
         .environment(router)
         .onChange(of: router.requested) { _, destination in
             guard destination != nil else { return }
@@ -449,6 +451,23 @@ struct HMTabShell<Home: View>: View {
             } else {
                 ExplorationAddSheet(type: type, currencyCode: model.snapshot.currencyCode)
             }
+        }
+    }
+}
+
+/// C-1: `tabViewBottomAccessory(isEnabled:content:)` needs iOS 26.1. On iOS 26.0 the accessory is added or left out
+/// instead.
+private struct HMBottomAccessory<Accessory: View>: ViewModifier {
+    let isEnabled: Bool
+    @ViewBuilder let accessory: Accessory
+
+    func body(content: Content) -> some View {
+        if #available(iOS 26.1, *) {
+            content.tabViewBottomAccessory(isEnabled: isEnabled) { accessory }
+        } else if isEnabled {
+            content.tabViewBottomAccessory { accessory }
+        } else {
+            content
         }
     }
 }
