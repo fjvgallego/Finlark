@@ -1,9 +1,10 @@
 name: CI
 
-# NFR-009: the build and the tests run on every push. See docs/adr/0011-build-and-ci.md.
+# NFR-009: the build and the tests run on every pull request and on main. See docs/adr/0011-build-and-ci.md.
 on:
-  push:
   pull_request:
+  push:
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}

@@ -128,7 +128,7 @@ Swift Testing for everything except UI tests, which use XCUITest ([ADR-0007](adr
   ```
 
 - `scripts/lint.sh` runs swift-format over everything except `Finlark/DesignExplorations/`.
-- GitHub Actions runs both on every push and pull request ([ADR-0011](adr/0011-build-and-ci.md), NFR-009).
+- GitHub Actions runs both on every pull request and on every push to `main` ([ADR-0011](adr/0011-build-and-ci.md), NFR-009).
 
 ## Where future releases plug in
 
