@@ -118,6 +118,18 @@ measurement shows that it must ([ADR-0006](adr/0006-concurrency.md)).
 
 Swift Testing for everything except UI tests, which use XCUITest ([ADR-0007](adr/0007-testing-strategy.md), NFR-009).
 
+## Build and CI
+
+- The shared `Finlark` scheme builds the app and runs every test target in `Finlark.xctestplan`:
+
+  ```sh
+  xcodebuild test -project Finlark.xcodeproj -scheme Finlark \
+      -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' CODE_SIGNING_ALLOWED=NO
+  ```
+
+- `scripts/lint.sh` runs swift-format over everything except `Finlark/DesignExplorations/`.
+- GitHub Actions runs both on every push and pull request ([ADR-0011](adr/0011-build-and-ci.md), NFR-009).
+
 ## Where future releases plug in
 
 | Release | Builds on |
@@ -146,4 +158,3 @@ Check these in every code review:
 
 - The data model itself: entities, relationships and the v1.0 schema. It gets its own ticket.
 - How the app picks up data written by extensions (v2.0, v2.2).
-- Build and test commands and the CI setup.
