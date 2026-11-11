@@ -45,7 +45,9 @@ SwiftUI or SwiftData, the exception is stated.
 - [swift-format](https://github.com/swiftlang/swift-format), which ships with the Swift toolchain, enforces formatting
   with the [`.swift-format`](../../.swift-format) file at the repository root: 4 spaces, 120 columns, imports sorted.
 - It also rejects force unwraps, `try!` and implicitly unwrapped optionals outside test files. Previews aren't exempt.
-- How it runs in Xcode and CI is decided with the CI setup.
+- `scripts/lint.sh` runs it over every Swift file in `Finlark/` and `Packages/`, skipping
+  `Finlark/DesignExplorations/`, which is reference code written before these rules. CI runs the script and fails on
+  any finding ([ADR-0011](../adr/0011-build-and-ci.md)).
 - A `// swift-format-ignore` needs a comment saying why.
 
 ## Naming

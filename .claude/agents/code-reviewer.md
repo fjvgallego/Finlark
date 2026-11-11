@@ -20,7 +20,7 @@ docs don't support.
 ## Rules
 
 - Read only. Never edit, stage, commit or push. Use Bash only for read-only commands such as `git diff`, `git log`,
-  `git show` and `xcrun swift-format lint`.
+  `git show` and `scripts/lint.sh`.
 - Report only real problems, each tied to a rule in the docs. Leave out taste and nitpicks the docs don't cover.
 - Don't decide architecture, data model, dependency or UI/UX questions. List them as questions for the owner.
 

@@ -1,0 +1,46 @@
+name: CI
+
+# NFR-009: the build and the tests run on every pull request and on main. See docs/adr/0011-build-and-ci.md.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  # Every push to main keeps its own result. Only superseded pull request runs are cancelled.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_27.1.app/Contents/Developer
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: xcode-27
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: swift-format
+        run: scripts/lint.sh
+
+  test:
+    name: Build and test
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build and test
+        run: |
+          xcodebuild test \
+            -project Finlark.xcodeproj \
+            -scheme Finlark \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' \
+            CODE_SIGNING_ALLOWED=NO

@@ -18,6 +18,10 @@ Changing anything on this page needs an ADR, in the same commit. Terms follow th
 All code except the app's entry point lives in a local Swift package, `Packages/FinlarkKit`
 ([ADR-0003](adr/0003-module-structure.md)).
 
+The one exception is `Finlark/DesignExplorations/`: the FIN-9 designs, kept in the app target as reference code so
+their previews keep working. Nothing in the app uses them, the rules on this page don't apply to them, and each one
+is deleted when its screen is implemented in `Features`.
+
 ```mermaid
 flowchart TD
     App[App target] --> Features
@@ -114,9 +118,24 @@ measurement shows that it must ([ADR-0006](adr/0006-concurrency.md)).
 | Draft and router tests | Draft validation, which screen a route opens |
 | Persistence integration tests | Use cases, the duplicate cleanup step, migrations, on an in-memory store |
 | UI smoke tests | Onboarding, add an expense, split and repay, confirm a pending item |
-| Manual, before each release | iCloud sync, App Lock, notifications, accessibility and appearance |
+| Manual, before each release | iCloud sync, App Lock, notifications, accessibility and appearance, and a run on iOS 26, because CI tests on iOS 27 |
 
 Swift Testing for everything except UI tests, which use XCUITest ([ADR-0007](adr/0007-testing-strategy.md), NFR-009).
+
+## Build and CI
+
+- The shared `Finlark` scheme builds the app and runs every test target in `Finlark.xctestplan`:
+
+  ```sh
+  xcodebuild test -project Finlark.xcodeproj -scheme Finlark \
+      -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' CODE_SIGNING_ALLOWED=NO
+  ```
+
+- `scripts/lint.sh` runs swift-format over every Swift file in `Finlark/` and `Packages/`, except
+  `Finlark/DesignExplorations/`.
+- A new test target is added to `Finlark.xctestplan` in the same commit, or CI won't run it.
+- GitHub Actions runs both on every pull request and on every push to `main`
+  ([ADR-0011](adr/0011-build-and-ci.md), NFR-009).
 
 ## Where future releases plug in
 
@@ -146,4 +165,4 @@ Check these in every code review:
 
 - The data model itself: entities, relationships and the v1.0 schema. It gets its own ticket.
 - How the app picks up data written by extensions (v2.0, v2.2).
-- Build and test commands and the CI setup.
+- How NFR-008 is measured (10,000 transactions).

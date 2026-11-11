@@ -4,6 +4,10 @@ xcuserdata/
 # Build output
 build/
 DerivedData/
+*.xcresult
+*.xcarchive
+*.ipa
+*.dSYM.zip
 
 # macOS
 .DS_Store
@@ -12,9 +16,19 @@ DerivedData/
 .env
 .env.*
 *.p12
+*.p8
+*.pem
+*.key
 *.cer
+*.certSigningRequest
 *.mobileprovision
+*.provisionprofile
+ExportOptions.plist
 
 # Local agent settings and notes
 .claude/settings.local.json
 CLAUDE.local.md
+
+# Swift Package Manager
+.build/
+.swiftpm/

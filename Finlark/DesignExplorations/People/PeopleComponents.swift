@@ -1088,7 +1088,8 @@ struct PPReminderSheet: View {
 }
 
 /// A sent message's bubble: rounded, with a tighter bottom-trailing corner.
-struct PPBubble: Shape {
+/// `nonisolated` because SwiftUI can ask a `Shape` for its path off the main actor.
+nonisolated struct PPBubble: Shape {
     func path(in rect: CGRect) -> Path {
         UnevenRoundedRectangle(
             topLeadingRadius: 18, bottomLeadingRadius: 18, bottomTrailingRadius: 4, topTrailingRadius: 18,

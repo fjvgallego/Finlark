@@ -17,10 +17,12 @@ Only Swift files. Skip `Finlark/DesignExplorations/` unless the owner asks.
 ## 2. Run swift-format
 
 ```sh
-xcrun swift-format lint --configuration .swift-format --strict <changed .swift files>
+scripts/lint.sh
 ```
 
-Report what it finds. If it can't run, say so and carry on with the manual review.
+It's the same check CI runs ([ADR-0011](../../../docs/adr/0011-build-and-ci.md)): every Swift file in `Finlark/` and
+`Packages/` except the design explorations. Report what it finds. If it can't run, say so and carry on with the manual
+review.
 
 ## 3. Read the guide
 
