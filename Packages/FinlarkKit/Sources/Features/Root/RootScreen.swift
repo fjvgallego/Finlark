@@ -10,6 +10,21 @@ public struct RootScreen: View {
     }
 }
 
-#Preview {
+#Preview("Light") {
     RootScreen()
+}
+
+#Preview("Dark") {
+    RootScreen()
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Accessibility size") {
+    RootScreen()
+        .dynamicTypeSize(.accessibility3)
+}
+
+#Preview("Spanish") {
+    RootScreen()
+        .environment(\.locale, Locale(identifier: "es"))
 }

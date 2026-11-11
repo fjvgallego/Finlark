@@ -1,6 +1,6 @@
 #!/bin/sh
 # Lints every Swift file with swift-format, as CI does (ADR-0011).
-# Finlark/DesignExplorations is skipped: it's FIN-9 reference code that goes away as screens are implemented.
+# Finlark/DesignExplorations is skipped: it's FIN-9 reference code written before the .swift-format rules.
 set -eu
 cd "$(dirname "$0")/.."
 

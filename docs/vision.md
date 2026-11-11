@@ -59,5 +59,5 @@ and one experience across all of your Apple devices.
 - Approved and published on the App Store (iPhone, iOS 26+), in English and Spanish.
 - Every requirement in [requirements/v1.md](requirements/v1.md) meets its acceptance criteria.
 - Domain logic (balance, splits, repayments, projection, recurrence) is covered by automated tests that run in CI on
-  every pull request and on `main`.
+  every pull request and on every push to `main`.
 - Data syncs to iCloud and restores correctly on a new iPhone.
