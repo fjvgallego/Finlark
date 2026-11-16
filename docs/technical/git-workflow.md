@@ -20,6 +20,7 @@ pull request.
 - One logical change per commit. Docs change in the same commit as the code they describe.
 - Stage files by path, never with `git add -A` or `git add .`. Check what is already staged before committing.
 - Never commit secrets, API keys, certificates, provisioning profiles or personal data. The repository is public.
+  The Apple development team ID (`DEVELOPMENT_TEAM` in `project.pbxproj`) isn't a secret and is allowed.
 
 ## Review before committing
 

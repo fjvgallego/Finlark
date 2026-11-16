@@ -14,7 +14,7 @@ The owner's target if they gave one. Otherwise the current branch against `main`
 
 | Agent | Runs when the change touches |
 |---|---|
-| `code-reviewer` | Any `.swift` file outside `Finlark/DesignExplorations/` |
+| `code-reviewer` | Any `.swift` file outside `Finlark/DesignExplorations/` (`Package.swift` included), `Finlark.xctestplan`, `project.pbxproj`, or any file in `.github/workflows/` |
 | `docs-keeper` | `docs/`, `AGENTS.md`, `.claude/` skills and agents, `.github/`, or Swift behavior that a requirement, ADR or `architecture.md` describes |
 | `security-auditor` | Always. The repository is public, so a secret can land in any file. |
 

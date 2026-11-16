@@ -14,10 +14,12 @@ Domain terms used across docs, code and tickets. Code identifiers should use the
 | **Category** | A label for transactions (Groceries, Dining, Salary…). Flat, typed as expense or income. Can be archived. |
 | **Home currency** | The currency used for new transactions and all totals. Chosen at onboarding. Every transaction also stores its own ISO currency code. |
 | **Recurring template** | A rule that describes a repeating transaction (amount, category, note, type, frequency, start/end date). |
+| **Occurrence** | One date on which a recurring template falls, from its frequency and its start and end dates. See *Pending item*. |
 | **Pending item** | An occurrence of a recurring template that is due and waiting for the user to confirm, edit or skip it. Doesn't affect balance or spending until confirmed. |
 | **Monthly Plan** | The set of planned amounts per expense category for a calendar month. Set by the user. |
 | **Planned amount** | The amount the user expects to spend in one category in a month (e.g. €100 Fuel). |
 | **Projection** | The estimated spending at month end for a category (or overall), based on the current pace plus pending recurring expenses still due this month. |
+| **Plan status** | How a planned category, or the plan as a whole (HOM-003), is doing in the current month: *On track*, *At risk* or *Over*, as defined in PLN-002. |
 | **Person** | A friend the user splits expenses with. A local record (name, optionally prefilled from Contacts). Friends don't need Finlark. |
 | **Split** | An expense the user paid that is shared with one or more people. |
 | **Split mode** | How a split is divided: *Equal*, *Exact amounts* or *By item*. |
@@ -27,3 +29,4 @@ Domain terms used across docs, code and tickets. Code identifiers should use the
 | **Repayment** | Money a person gives back for their share. Raises the balance. Is **not** income and doesn't change spending. |
 | **Settle all** | A person-level action that records repayments covering every open share that person has. |
 | **IOU / Owed to you** | The outstanding (unpaid) part of people's shares. Shown separately from the balance. |
+| **App Lock** | Optional protection that asks for Face ID or Touch ID, with the device passcode as fallback, when Finlark opens or returns after a minute or more in the background (SEC-001). Set per device. |
