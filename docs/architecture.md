@@ -45,6 +45,34 @@ flowchart TD
 
 ## Data
 
+### Model
+
+The v1.0 schema is `SchemaV1` in Persistence ([ADR-0012](adr/0012-v1-data-model.md)):
+
+```mermaid
+erDiagram
+    Account |o--o{ Transaction : holds
+    Category |o--o{ Transaction : labels
+    Transaction |o--o{ Share : "split into"
+    Transaction |o--o{ SplitItem : "itemized as"
+    SplitItem }o--o{ Share : "assigned to"
+    Person |o--o{ Share : owes
+    Share |o--o{ Repayment : "paid by"
+    RecurringTemplate |o--o{ TemplateRevision : "valued by"
+    RecurringTemplate |o--o{ OccurrenceRecord : "confirmed or skipped by"
+    Category |o--o{ TemplateRevision : labels
+    Category |o--o{ PlannedAmount : "planned by"
+```
+
+- The user's own share of a split is stored on the transaction. Share records exist only for people.
+- A recurring template's values live in its template revisions, each from a given day on. A month's plan for a
+  category is its latest planned amount from that month or before. Past months' values are never changed.
+- A transaction that comes from a template, by confirming or by *Make recurring*, stores the template's ID and the
+  occurrence date.
+- Dates without a time are stored as `yyyymmdd` integers, months as `yyyymm`, and enumerations as `String` raw values.
+- Names, notes, amounts and what identifies a category (seed key, icon, color) are end-to-end encrypted in iCloud.
+- Everything else the screens show (balance, spending, statuses, pending items, projections) is calculated.
+
 ### Reading
 
 Views read models with `@Query`. There are no view models for reading. Values that need rules, such as the balance,
@@ -78,9 +106,9 @@ Every monthly calculation goes through Domain's period type, so a custom month s
 
 - The store lives in an App Group container and syncs to the CloudKit private database
   ([ADR-0009](adr/0009-store-location.md)).
-- Pending items are calculated from recurring templates, not stored. Confirm and skip records are keyed by the
-  template's ID and the occurrence date, and duplicates are cleaned up the same way on every device. Default data has
-  a seed key, and two setups meeting through iCloud lead to the ONB-005 choice, never a silent merge
+- Pending items are calculated from recurring templates, not stored. Occurrence records (confirm and skip) are keyed by
+  the template's ID and the occurrence date, and duplicates are cleaned up the same way on every device. Default data
+  has a seed key, and two setups meeting through iCloud lead to the ONB-005 choice, never a silent merge
   ([ADR-0004](adr/0004-sync-duplicates.md), A-12).
 - The schema is versioned from v1.0 (NFR-010). Once the CloudKit schema is in production, versions only add record
   types and fields ([ADR-0002](adr/0002-domain-logic-and-swiftdata.md)).
@@ -92,7 +120,9 @@ Every monthly calculation goes through Domain's period type, so a custom month s
   save and when synced data arrives ([ADR-0003](adr/0003-module-structure.md)).
 - **App Lock** and the **iCloud account status** live in Services.
 - **Settings** for notifications, IOU reminder days and App Lock are per device, in `UserDefaults`. Everything else in
-  Settings is synced data ([ADR-0010](adr/0010-per-device-settings.md)).
+  Settings is synced data ([ADR-0010](adr/0010-per-device-settings.md)). Each device also keeps there the shares it
+  has sent an IOU reminder for and the day it was set up, so a reminder fires once per share on that device and a new
+  device doesn't send reminders for old shares ([ADR-0012](adr/0012-v1-data-model.md)).
 
 ## Navigation
 
@@ -163,6 +193,5 @@ Check these in every code review:
 
 ## Not decided yet
 
-- The data model itself: entities, relationships and the v1.0 schema. It gets its own ticket.
 - How the app picks up data written by extensions (v2.0, v2.2).
 - How NFR-008 is measured (10,000 transactions).

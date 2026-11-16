@@ -15,3 +15,4 @@ How ADRs are written: [ADR-0001](0001-record-architecture-decisions.md).
 | [0009](0009-store-location.md) | Store location | Accepted |
 | [0010](0010-per-device-settings.md) | Per-device settings | Accepted |
 | [0011](0011-build-and-ci.md) | Build and CI | Accepted |
+| [0012](0012-v1-data-model.md) | The v1.0 data model | Accepted |
