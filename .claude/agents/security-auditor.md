@@ -12,9 +12,10 @@ user's iCloud private database, has no backend, and its repository is **public**
 Review the target from your prompt, or the current branch against `main` including uncommitted changes. For anything
 touching the areas below, read the requirement or ADR cited before judging.
 
-- **Secrets in the repository:** API keys, tokens, passwords, certificates, provisioning profiles, team IDs that
-  shouldn't be public, personal data, real financial data in fixtures or previews. Check committed history on the
-  branch too (`git log -p main..HEAD`), not just the working tree.
+- **Secrets in the repository:** API keys, tokens, passwords, certificates, provisioning profiles, personal data,
+  real financial data in fixtures or previews. The development team ID is allowed
+  ([git-workflow.md](../../docs/technical/git-workflow.md#commits)). Check committed history on the branch too
+  (`git log -p main..HEAD`), not just the working tree.
 - **Dependencies:** no analytics, tracking or third-party data SDKs (NFR-007). Any new package or framework needs an
   ADR and the owner's approval.
 - **Network:** no network use except CloudKit (C-5, NFR-006). Flag `URLSession`, web views and any URLs fetched at

@@ -10,6 +10,7 @@ change in the same commits as the code they describe.
 | [requirements/v1.md](requirements/v1.md) | v1.0 scope: functional and non-functional requirements, out of scope, assumptions |
 | [roadmap.md](roadmap.md) | Planned releases after v1.0 and their dependencies |
 | [architecture.md](architecture.md) | How Finlark is built: modules, data flow, services, navigation, build and CI, rules |
+| [design/](design/README.md) | The design chosen for each v1 screen, navigation, the look and default category icons |
 | [adr/](adr/README.md) | Architecture Decision Records: why the architecture is the way it is |
 | [technical/coding-style.md](technical/coding-style.md) | How Swift is written: design principles, functional style, formatting, naming, SwiftUI, localization, accessibility, logging, tests |
 | [technical/git-workflow.md](technical/git-workflow.md) | Branches, commits, review before committing, pull requests and their descriptions, merging |
@@ -18,8 +19,10 @@ change in the same commits as the code they describe.
 
 Created when their step starts, not before:
 
-- `docs/design/`: main screens and flows.
 - More of `docs/technical/`: testing and security rules.
+- `docs/technical/release.md`: the release process, covering signing, TestFlight, App Store submission, version and
+  build numbers, the privacy policy URL (NFR-007, SET-001) and the manual checks before each release
+  ([architecture.md](architecture.md#testing)).
 
 ## Conventions
 

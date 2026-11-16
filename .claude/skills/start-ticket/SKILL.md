@@ -30,7 +30,8 @@ If the branch already exists, switch to it instead and say so.
 - Find the requirement IDs the ticket touches in [requirements/v1.md](../../../docs/requirements/v1.md), and the
   terms it uses in the [glossary](../../../docs/glossary.md).
 - Find the ADRs behind the areas involved in the [ADR index](../../../docs/adr/README.md).
-- For screens, check the chosen design in `Finlark/DesignExplorations/`.
+- For screens, check the chosen design in [docs/design/](../../../docs/design/README.md), including any items still
+  marked *To confirm*, and its code in `Finlark/DesignExplorations/`.
 - Read [coding-style.md](../../../docs/technical/coding-style.md) if the ticket involves Swift.
 
 ## 4. Report to the owner

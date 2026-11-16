@@ -1,6 +1,6 @@
 ---
 name: check-architecture
-description: Review Finlark code changes against the architecture rules in docs/architecture.md (module imports, writes through use cases, money types, clock, periods, routes, system frameworks, concurrency). Use to review a diff, branch or file before the owner reviews it, or when asked for an architecture check.
+description: Review Finlark code changes against the architecture rules in docs/architecture.md (module imports, writes through use cases, money types, clock, periods, routes, system frameworks, concurrency, build and CI files). Use to review a diff, branch or file before the owner reviews it, or when asked for an architecture check.
 ---
 
 # Check architecture
@@ -26,6 +26,11 @@ through ADRs. Check against:
   model (no unique constraints, every property optional or defaulted, every relationship optional).
 - **Data:** reads with `@Query` and Domain functions, writes through use cases with one save per user action, and
   drafts holding plain values.
+- **Build and CI:** for changes to `Package.swift`, `Finlark.xctestplan`, `project.pbxproj` or `.github/workflows/`,
+  the Build and CI section and [ADR-0011](../../../docs/adr/0011-build-and-ci.md). Each target's dependencies in
+  `Package.swift` stay within its row in the Modules table, a new test target is in the test plan, and the build
+  settings ADR-0011 sets (iPhone only, portrait only, iOS 26.0 minimum, member import visibility) don't change
+  without an ADR.
 
 `Finlark/DesignExplorations/` holds design prototypes, not production code. Skip it unless the owner asks.
 

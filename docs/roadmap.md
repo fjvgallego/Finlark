@@ -13,7 +13,7 @@ file when it's planned in detail.
 
 | Version | Theme | Highlights |
 |---|---|---|
-| **1.0** | Core (iPhone) | Transactions, categories, single account, recurring (confirm-to-post), Monthly Plan + projection, bill splitting, notifications, app lock, iCloud sync. See [requirements/v1.md](requirements/v1.md). |
+| **1.0** | Core (iPhone) | Transactions, categories, single account, recurring (confirm-to-post), Monthly Plan + projection, bill splitting, notifications, App Lock, iCloud sync. See [requirements/v1.md](requirements/v1.md). |
 | 1.1 | Payee / merchant | Optional payee field with autocomplete that pre-fills the category. Per-merchant totals. |
 | 1.2 | Data portability | CSV export and CSV import. |
 | 1.3 | Plan alerts & month start | Plan threshold notifications. Custom month start day (e.g. payday). |

@@ -7,6 +7,8 @@ description: Write an Architecture Decision Record for Finlark in docs/adr/. Use
 
 How ADRs work is in [ADR-0001](../../../docs/adr/0001-record-architecture-decisions.md). Read it first, including
 its template.
+If the vendored `domain-modeling` skill is loaded too, ADR-0001 and this skill win everywhere they differ: which
+decisions get an ADR, the template, the numbering and the index.
 
 ## 1. Check that it needs an ADR
 
