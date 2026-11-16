@@ -15,15 +15,17 @@ Domain terms used across docs, code and tickets. Code identifiers should use the
 | **Home currency** | The currency used for new transactions and all totals. Chosen at onboarding. Every transaction also stores its own ISO currency code. |
 | **Recurring template** | A rule that describes a repeating transaction (amount, category, note, type, frequency, start/end date). |
 | **Occurrence** | One date on which a recurring template falls, from its frequency and its start and end dates. See *Pending item*. |
+| **Template revision** | The values of a recurring template from a given day on. A change to a template adds one, so occurrences already due keep their values (REC-005). A change made before anything the latest revision covers is confirmed or skipped updates that revision instead. |
+| **Occurrence record** | Marks one occurrence as confirmed or skipped, keyed by the template's ID and the occurrence's date. |
 | **Pending item** | An occurrence of a recurring template that is due and waiting for the user to confirm, edit or skip it. Doesn't affect balance or spending until confirmed. |
 | **Monthly Plan** | The set of planned amounts per expense category for a calendar month. Set by the user. |
-| **Planned amount** | The amount the user expects to spend in one category in a month (e.g. €100 Fuel). |
+| **Planned amount** | The amount the user expects to spend in one category in a month (e.g. €100 Fuel). Stored from the month it was set until it's changed or cleared (A-08). |
 | **Projection** | The estimated spending at month end for a category (or overall), based on the current pace plus pending recurring expenses still due this month. |
 | **Plan status** | How a planned category, or the plan as a whole (HOM-003), is doing in the current month: *On track*, *At risk* or *Over*, as defined in PLN-002. |
 | **Person** | A friend the user splits expenses with. A local record (name, optionally prefilled from Contacts). Friends don't need Finlark. |
 | **Split** | An expense the user paid that is shared with one or more people. |
 | **Split mode** | How a split is divided: *Equal*, *Exact amounts* or *By item*. |
-| **Share** | The part of a split that belongs to one participant. The user's own share counts as spending. Each person's share is owed to the user. |
+| **Share** | The part of a split that belongs to one participant. The user's own share counts as spending. Each person's share is owed to the user. The user's share is stored on the transaction, so Share records exist only for people. |
 | **Split item** | A line of a ticket in *By item* mode (e.g. "Pizza €12"), assigned to one or more participants. |
 | **Debtor** | A person who owes the user part of a split. Status per split: *Pending*, *Partially paid* or *Paid*. |
 | **Repayment** | Money a person gives back for their share. Raises the balance. Is **not** income and doesn't change spending. |
