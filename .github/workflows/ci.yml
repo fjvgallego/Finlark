@@ -42,5 +42,5 @@ jobs:
           xcodebuild test \
             -project Finlark.xcodeproj \
             -scheme Finlark \
-            -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
             CODE_SIGNING_ALLOWED=NO

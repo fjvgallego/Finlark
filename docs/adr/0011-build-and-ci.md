@@ -2,6 +2,11 @@
 
 Status: **Accepted** (2026-11-11) · Ticket: FIN-12 · Requirements: C-1, NFR-001, NFR-009
 
+*Edited in place on 2026-11-16 (FIN-14), as an exception the owner approved: the test destination changed from
+`OS=27.0` to `OS=latest`, because the `xcode-27` runner image dropped the iOS 27.0 simulator runtime. `latest` resolves
+to the iOS version of the selected Xcode's simulator SDK (iOS 27.1 with Xcode 27.1 in CI), so the runner image must
+have that runtime. Run locally, it follows whichever Xcode is selected there.*
+
 ## Context
 
 - NFR-009: the build and the tests run in CI on every pull request and on every push to `main`. It said "on every
@@ -38,7 +43,7 @@ Option 1.
 
   ```sh
   xcodebuild test -project Finlark.xcodeproj -scheme Finlark \
-      -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' CODE_SIGNING_ALLOWED=NO
+      -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' CODE_SIGNING_ALLOWED=NO
   ```
 
 - **Lint** is `scripts/lint.sh`: `swift format lint --strict` with the repository's `.swift-format` over every Swift
@@ -58,7 +63,7 @@ Option 1.
   anything by hand.
 - A branch is checked only once it has a pull request. Before that nothing runs automatically, and the same commands
   can be run locally.
-- The Xcode version, the simulator and the runner label are written in the workflow. They need a manual update when
+- The Xcode version, the simulator device and the runner label are written in the workflow. They need a manual update when
   the project moves to a new Xcode, and when the `xcode-27` image leaves preview or is renamed.
 - Tests run on the iOS 27 simulator, not on iOS 26. The iOS 26.0 minimum is checked only by the compiler's
   availability errors, so behavior on iOS 26 is part of the manual checks before a release.

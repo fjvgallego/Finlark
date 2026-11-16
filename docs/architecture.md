@@ -128,7 +128,7 @@ Swift Testing for everything except UI tests, which use XCUITest ([ADR-0007](adr
 
   ```sh
   xcodebuild test -project Finlark.xcodeproj -scheme Finlark \
-      -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' CODE_SIGNING_ALLOWED=NO
+      -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' CODE_SIGNING_ALLOWED=NO
   ```
 
 - `scripts/lint.sh` runs swift-format over every Swift file in `Finlark/` and `Packages/`, except
