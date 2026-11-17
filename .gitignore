@@ -27,6 +27,7 @@ ExportOptions.plist
 
 # Local agent settings and notes
 .claude/settings.local.json
+.claude/reviews/
 CLAUDE.local.md
 
 # Swift Package Manager

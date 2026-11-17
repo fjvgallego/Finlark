@@ -38,9 +38,12 @@ starts, says in its summary that the review didn't run.
 
 - A pull request's title is the ticket key and a summary: `FIN-10: Architecture ADRs and engineering guides`.
 - Its description follows the [template](../../.github/pull_request_template.md): Summary, Ticket, Changes, Decisions,
-  Testing and Follow-ups.
-  - Every section stays. An empty one says "None", so the reader knows it was considered.
+  Agent review, Testing and Follow-ups.
+  - Every section stays. An empty one says "None", unless its comment in the template gives other wording, so the
+    reader knows it was considered.
   - It's written in plain language for someone who didn't follow the ticket.
+  - It never contains secret values, personal data or real financial data. A security finding that is still open is
+    described only in general terms, such as "one security finding left for FIN-n", unless the owner agrees to more.
   - A description written by an agent ends with the attribution line the agent is given.
 
 When a branch is ready:

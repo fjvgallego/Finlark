@@ -1,6 +1,6 @@
 ---
 name: ready
-description: Check that a Finlark change is ready for the owner's review by running the review agents (code-reviewer, docs-keeper, security-auditor) in parallel and merging their findings. Use before handing a change to the owner, or when the owner asks if a change is ready.
+description: Check that a Finlark change is ready for the owner's review by running the review agents (code-reviewer, docs-keeper, security-auditor) in parallel, merging their findings and saving the report for the ticket. Use before handing a change to the owner, or when the owner asks if a change is ready.
 ---
 
 # Ready for review
@@ -35,7 +35,28 @@ Start the chosen agents in parallel, in one message. Give each one:
   dependencies, UI/UX or scope.
 - Say which agents ran, which were skipped and why.
 
-## 5. Point to the bug review
+## 5. Save the report
+
+Add the merged report to `.claude/reviews/FIN-n.md`, with the ticket key from the reviewed branch's name (`FIN-n-…`,
+see [git-workflow.md](../../../docs/technical/git-workflow.md#branches)), or from the current branch when the target is
+paths or uncommitted changes. Git ignores this folder. Create the file if it doesn't exist. Otherwise add to its end,
+so earlier runs are kept. Each run is one entry:
+
+```markdown
+## 2026-11-16 14:30 · FIN-16-pr-decisions-and-review against main, uncommitted changes included
+
+Ran: docs-keeper, security-auditor. Skipped: code-reviewer (no Swift or build files).
+
+- [docs-keeper] `docs/technical/git-workflow.md:40`: the finding. **Fixed:** what changed.
+- [security-auditor] `.gitignore:29`: the finding. **For the owner:** the question.
+```
+
+- If nothing was found, the entry says so.
+- The report never contains secret values, personal data or real financial data. For those, give the file, the line
+  and the kind of data.
+- If that branch doesn't start with `FIN-n-`, don't save the report, and say so.
+
+## 6. Point to the bug review
 
 These agents check Finlark's rules, not correctness. For changes with logic in them, suggest the owner run the
 built-in `/code-review`. Don't run it yourself, because it starts several reviewers of its own.

@@ -16,7 +16,16 @@
 
 ## Decisions
 
-<!-- Choices made during the work, and who made each one: the owner or the agent. "None" if there were none. -->
+<!-- Choices made during the work, in two lists: "Made by the owner" and "Made by the agent". Keep both lists. A list
+with no decisions says "None". When the owner went against the agent's recommendation, say what the agent suggested
+and why the owner chose otherwise, as product or technical reasons, never personal context. -->
+
+## Agent review
+
+<!-- Which agents the `ready` skill ran, then each finding and what happened to it: fixed, decided by the owner, or left
+as a follow-up (also listed under Follow-ups). Summarize the latest run, and mention earlier runs only for findings
+that led to a fix or to a decision by the owner. "No findings" after the agents if they found nothing. "Didn't run" if
+the review was skipped, and why. -->
 
 ## Testing
 
