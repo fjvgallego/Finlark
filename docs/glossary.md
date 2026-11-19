@@ -13,6 +13,8 @@ Domain terms used across docs, code and tickets. Code identifiers should use the
 | **Spending** | What the user consumed: the sum of expenses, counting only the user's share of split expenses. Used for stats, the Plan and projections. Never includes repayments. |
 | **Category** | A label for transactions (Groceries, Dining, Salary…). Flat, typed as expense or income. Can be archived. |
 | **Home currency** | The currency used for new transactions and all totals. Chosen at onboarding. Every transaction also stores its own ISO currency code. |
+| **Fund code** | An ISO 4217 code for a unit of account rather than money anyone holds, such as CLF or USN. Not a currency in Finlark ([ADR-0014](adr/0014-append-only-currency-table.md)). |
+| **Withdrawn currency** | A currency that was in Finlark's currency table and that ISO 4217 no longer lists. Amounts in it still load, but the user can't pick it ([ADR-0014](adr/0014-append-only-currency-table.md)). |
 | **Recurring template** | A rule that describes a repeating transaction (amount, category, note, type, frequency, start/end date). |
 | **Occurrence** | One date on which a recurring template falls, from its frequency and its start and end dates. See *Pending item*. |
 | **Template revision** | The values of a recurring template from a given day on. A change to a template adds one, so occurrences already due keep their values (REC-005). A change made before anything the latest revision covers is confirmed or skipped updates that revision instead. |
@@ -22,6 +24,8 @@ Domain terms used across docs, code and tickets. Code identifiers should use the
 | **Planned amount** | The amount the user expects to spend in one category in a month (e.g. €100 Fuel). Stored from the month it was set until it's changed or cleared (A-08). |
 | **Projection** | The estimated spending at month end for a category (or overall), based on the current pace plus pending recurring expenses still due this month. |
 | **Plan status** | How a planned category, or the plan as a whole (HOM-003), is doing in the current month: *On track*, *At risk* or *Over*, as defined in PLN-002. |
+| **Period** | The span of days that a monthly figure covers: spending, the Plan, projections and History's totals. In v1 a period is a Gregorian calendar month. From v1.3 it can start on a custom day of the month (roadmap 1.3). |
+| **Day** | A date in the Gregorian calendar, with no time or time zone, the same on every device ([ADR-0012](adr/0012-v1-data-model.md), [ADR-0013](adr/0013-gregorian-days.md)). Screens show it in the user's own calendar. |
 | **Person** | A friend the user splits expenses with. A local record (name, optionally prefilled from Contacts). Friends don't need Finlark. |
 | **Split** | An expense the user paid that is shared with one or more people. |
 | **Split mode** | How a split is divided: *Equal*, *Exact amounts* or *By item*. |

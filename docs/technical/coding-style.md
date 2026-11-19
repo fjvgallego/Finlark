@@ -28,15 +28,24 @@ SwiftUI or SwiftData, the exception is stated.
   - No protocol has a single implementation and no test double.
   - Use cases are concrete types, tested on an in-memory store.
   - There are no repository protocols over SwiftData ([ADR-0002](../adr/0002-domain-logic-and-swiftdata.md)).
+  - Fixed rules, such as Gregorian calendar arithmetic, are called directly, not passed in. Domain functions take the
+    clock's reading and the time zone as parameters ([ADR-0013](../adr/0013-gregorian-days.md)). System frameworks
+    sit behind a protocol at the system boundary.
 
 ## Functional style
 
+Finlark is written in a functional style. Where SwiftUI or SwiftData need state, as with `@State`, drafts and models,
+that state stays at the edges.
+
 - **Pure functions.** Domain functions depend only on their inputs. Outside Domain, side effects stay at the edges, in
   use cases and Services. Computed properties never have side effects.
-- **Immutability.** `let` over `var`. Return a new value instead of changing a parameter. `inout` only when a
-  measurement shows that copying costs too much.
-- **Transformations.** `map`, `filter`, `compactMap` and `reduce` when they read better than a loop, for example
-  `shares.map(\.amount).reduce(.zero, +)`. A `for` loop when there are side effects or early exits.
+- **Immutability.** `let`, never a local `var`. Return a new value instead of changing a parameter. `inout` only when
+  a measurement shows that copying costs too much, or when a Foundation API requires it, such as `NSDecimalRound`.
+  Then a small private function holds the `inout` and the local `var`s it needs.
+- **Transformations.** `map`, `filter`, `compactMap`, `allSatisfy` and `reduce` instead of loops, for example
+  `shares.map(\.amount).reduce(.zero, +)`. Validate first, then transform, instead of a loop that exits early. A `for`
+  loop only for side effects.
+- **Expressions.** `switch` and `if` expressions instead of assigning a variable in each branch.
 - **Clarity over cleverness.** No custom operators, point-free chains or currying. Unwrap optionals with `if let` or
   `guard let` rather than chained `map` and `flatMap`.
 
@@ -68,14 +77,19 @@ SwiftUI or SwiftData, the exception is stated.
 
 ## Access control
 
-- `internal` by default, `private` for what a type doesn't share, and `public` only for what another module uses.
-- Public types and functions have a documentation comment that says what they're for. Properties need one only when
-  the name isn't enough.
+- `internal` by default, `private` for what a type doesn't share, and `public` only for what another module uses, or
+  is meant to use as its ticket states.
 
 ## Swift
 
 - Value types by default. Classes are `final`.
 - `guard` for early exits.
+- Make invalid values impossible to build. When a value is always valid if its input is, give it a non-failable
+  initializer that takes that input, for example `Day(firstDayOf: period)`. Never an initializer that skips validation
+  and trusts its caller.
+- A type checks only what it guarantees: its stored format and its invariants. Limits on what the user may enter, such
+  as the earliest date of a transaction, are enforced by the use case, and the screen limits what can be entered.
+  Otherwise data that's already stored could stop being readable.
 - Each use case throws its own error type, named in domain terms (`RecordRepaymentError.exceedsRemaining`). Screens
   turn errors into localized messages. No `fatalError` for anything a user or synced data can cause.
 - `async`/`await` instead of completion handlers.
@@ -113,9 +127,13 @@ NFR-003:
 
 ## Comments
 
-- Comments explain why, not what. No commented-out code.
-- Cite a requirement ID where the code implements a rule that isn't obvious: `// A-03: the remainder goes to the
-  user's share`.
+- Code explains itself through names and types. Add a comment only when the code can't say it: why something
+  unexpected is done, a workaround, or a rule from the docs that the code alone doesn't show. Never comment what the
+  code already says.
+- The same goes for documentation comments, public API included: none when the name and signature are enough.
+- No commented-out code.
+- Where the code implements a rule that isn't obvious, cite its ID: the requirement, or the ADR when no requirement
+  states it. For example `// A-03: the remainder goes to the user's share`.
 
 ## Logging
 
@@ -126,8 +144,10 @@ NFR-003:
 ## Tests
 
 - Swift Testing, except UI tests ([ADR-0007](../adr/0007-testing-strategy.md)).
-- Display names start with the requirement ID when one applies: `@Test("SPL-002: €100 among 3 gives the user
-  €33.34")`.
+- Display names start with the ID of the document that states the behavior the test asserts. That's the requirement
+  when it states it: `@Test("SPL-002: €100 among 3 gives the user €33.34")`. Otherwise it's the ADR:
+  `@Test("ADR-0005: stored minor units round-trip through Decimal")`. Never an `architecture.md` rule number, because
+  those can be renumbered. Every rule there comes from an ADR.
 - Test functions describe the behavior, without a `test` prefix, because `@Test` already marks them:
   `func equalSplitGivesRemainderToUser()`. XCUITest methods keep the `test` prefix, which XCTest needs to find them.
 - One behavior per test. Repeated cases use `arguments:`.

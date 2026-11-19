@@ -70,6 +70,8 @@ erDiagram
 - A transaction that comes from a template, by confirming or by *Make recurring*, stores the template's ID and the
   occurrence date.
 - Dates without a time are stored as `yyyymmdd` integers, months as `yyyymm`, and enumerations as `String` raw values.
+  Days and months always use the Gregorian calendar, whatever calendar the user has chosen
+  ([ADR-0013](adr/0013-gregorian-days.md)).
 - Names, notes, amounts and what identifies a category (seed key, icon, color) are end-to-end encrypted in iCloud.
 - Everything else the screens show (balance, spending, statuses, pending items, projections) is calculated.
 
@@ -96,6 +98,9 @@ View → draft (if the screen edits) → use case → Domain rules → models ch
 Amounts are stored as `Int64` counts of the currency's minor units, next to their ISO 4217 code. Domain works only in
 `Decimal`, and Persistence converts between the two. Balance, spending and projections are calculated, never stored
 ([ADR-0005](adr/0005-money-storage.md), NFR-005).
+
+Domain's table of minor-unit digits is generated and append-only: a code is never removed and its digits never change
+([ADR-0014](adr/0014-append-only-currency-table.md)).
 
 ### Months
 
@@ -184,7 +189,9 @@ Check these in every code review:
 1. No module imports outside its row in [Modules](#modules).
 2. Views never insert, change or delete models. Writes go through use cases.
 3. Money is `Decimal` in Domain and `Int64` minor units in the store. Never `Double` or `Float`.
-4. Domain never reads the clock, the calendar or the time zone itself. They're passed in.
+4. Domain never reads the clock or the time zone itself. They're passed in. Stored days and months, and Domain's `Day`
+   and `Period`, always use the Gregorian calendar. Screens show dates in the user's calendar
+   ([ADR-0013](adr/0013-gregorian-days.md)).
 5. Monthly calculations go through Domain's period type.
 6. After v1.0 ships, schema changes only add record types and fields.
 7. Every pushed screen is a `Route` case, and screens don't hide the tab bar themselves.

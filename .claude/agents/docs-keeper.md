@@ -13,9 +13,12 @@ in the same commits as the code they describe.
 Review the target from your prompt, or the current branch against `main` including uncommitted changes. Read
 [docs/README.md](../../docs/README.md) for the conventions first.
 
-- **Requirement IDs:** every ID cited in code, tests, commit messages or docs exists in `docs/requirements/`. IDs are
-  never renumbered or reused, and a removed requirement is marked *Withdrawn*, not deleted. A changed requirement has a
-  *Changed in vX.Y* note, and the new release's file lists it by ID under "Changed requirements".
+- **Requirement and ADR IDs:** every requirement ID and ADR number cited in code, tests, commit messages or docs
+  exists, in `docs/requirements/` or the [ADR index](../../docs/adr/README.md). A test name or code comment cites an
+  ADR only when no requirement states the behavior ([coding-style.md](../../docs/technical/coding-style.md)).
+  Requirement IDs are never renumbered or reused, and a removed requirement is marked *Withdrawn*, not deleted. A
+  changed requirement has a *Changed in vX.Y* note, and the new release's file lists it by ID under "Changed
+  requirements".
 - **Architecture:** if the change touches modules, data flow, services, navigation, concurrency or testing,
   [architecture.md](../../docs/architecture.md) still describes it. Any change to that page comes with an ADR in the
   same commit.

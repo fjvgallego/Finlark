@@ -28,7 +28,8 @@ Created when their step starts, not before:
 
 - **Requirement IDs** (`SPL-003`, `NFR-005`…) are stable. They are never renumbered or reused. A removed requirement
   is marked *Withdrawn* and keeps its ID.
-- Jira tickets, tests and ADRs reference requirement IDs.
+- Jira tickets, tests and ADRs reference requirement IDs. Tests and code comments cite an ADR instead when no
+  requirement states the rule ([coding-style.md](technical/coding-style.md)).
 - A requirement lives in the file of the release that introduced it. If a later release changes it, it’s edited in place with a _Changed in vX.Y_ note, and the new release file lists it under “Changed requirements” by ID.
 - Terms in the [glossary](glossary.md) are used with exactly that meaning everywhere, especially **Spending** vs
   **Balance**.
