@@ -16,3 +16,5 @@ How ADRs are written: [ADR-0001](0001-record-architecture-decisions.md).
 | [0010](0010-per-device-settings.md) | Per-device settings | Accepted |
 | [0011](0011-build-and-ci.md) | Build and CI | Accepted |
 | [0012](0012-v1-data-model.md) | The v1.0 data model | Accepted |
+| [0013](0013-gregorian-days.md) | Stored days are Gregorian, and Domain takes a time zone instead of a calendar | Accepted |
+| [0014](0014-append-only-currency-table.md) | The currency table is append-only and leaves out fund codes | Accepted |
