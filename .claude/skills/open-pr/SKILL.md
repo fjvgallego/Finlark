@@ -17,8 +17,9 @@ any time. Pushing and opening the pull request happen only when the owner asks.
 - `git log main..HEAD` and `git diff main...HEAD` for everything on the branch, not just the last commit.
 - `git log -p main..HEAD`, to check that no commit on the branch ever added a secret, even one removed later.
 - The Jira ticket, the requirement IDs and the ADRs involved.
-- The decisions made during the work, and who made each one: the owner or the agent. Note every time the owner went
-  against the agent's recommendation.
+- The decisions made during the work, and which of the template's four Decisions lists each one belongs to. Note
+  every time the owner raised a decision, overrode the agent's recommendation or challenged a proposal. If the
+  session and the report don't show which list a decision belongs to, ask the owner.
 - The `ready` skill's results, from the session and from the ticket's report in `.claude/reviews/FIN-n.md` if it
   exists. For each finding the report leaves *For the owner*, find what the owner decided in the session, and ask the
   owner if it isn't there. If neither the session nor the report shows that the review ran, ask the owner whether it
