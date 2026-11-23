@@ -1,6 +1,6 @@
 # ADR-0001: Record architecture decisions
 
-Status: **Accepted** (2026-11-03) · Ticket: FIN-10
+Status: **Superseded by [ADR-0015](0015-adrs-for-hard-to-reverse-decisions.md)** (2026-11-23) · Ticket: FIN-10
 
 ## Context
 

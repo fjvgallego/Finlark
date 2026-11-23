@@ -45,6 +45,7 @@ path/to/File.swift:42: Rule 2 (views never change models)
 
 - Cite the rule or table row, and the ADR behind it when it helps.
 - Suggest a concrete fix.
-- If something looks wrong but no rule covers it, list it separately as a question for the owner. Changing the
-  architecture needs an ADR ([write-adr](../write-adr/SKILL.md)).
+- If something looks wrong but no rule covers it, list it separately as a question for the owner. Whether a fix
+  needs an ADR is decided by [ADR-0015](../../../docs/adr/0015-adrs-for-hard-to-reverse-decisions.md)
+  ([write-adr](../write-adr/SKILL.md)).
 - If you find nothing, say so, and say what you checked.

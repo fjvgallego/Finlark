@@ -16,7 +16,8 @@ Product documentation lives in [docs/](docs/README.md) and is the source of trut
 
 ### Architecture
 - Before writing or changing code, read [docs/architecture.md](docs/architecture.md) and follow its rules.
-- Changing the architecture needs an [ADR](docs/adr/README.md) approved by the owner.
+- A decision that is hard to reverse is recorded in an [ADR](docs/adr/README.md) approved by the owner.
+  [ADR-0015](docs/adr/0015-adrs-for-hard-to-reverse-decisions.md) says which decisions those are.
 
 ### Coding style
 - Write Swift following [docs/technical/coding-style.md](docs/technical/coding-style.md).
