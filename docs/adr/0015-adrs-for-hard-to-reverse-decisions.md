@@ -93,5 +93,5 @@ What gets easier, what gets harder, and follow-ups.
 - Smaller decisions are still visible, in pull requests and code comments, but nothing collects them in one place.
 - Whether a decision passes the test is a judgment. When the agent is unsure, it asks the owner.
 - This ADR doesn't rewrite or reclassify ADR-0002 to ADR-0014.
-- AGENTS.md, architecture.md, the `write-adr` and `check-architecture` skills and the `docs-keeper` agent now point
-  to this ADR instead of requiring an ADR for every change.
+- AGENTS.md, architecture.md, the ADR index, the pull request template, the `write-adr` and `check-architecture`
+  skills and the `docs-keeper` agent now point to this ADR instead of requiring an ADR for every change.

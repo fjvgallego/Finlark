@@ -16,8 +16,9 @@ Read the changed files in full, not just the diff lines, so you can see their im
 
 ## 2. Read the rules
 
-Read [architecture.md](../../../docs/architecture.md) every time. Don't work from memory, because the page changes
-through ADRs. Check against:
+Read [architecture.md](../../../docs/architecture.md) every time. Don't work from memory, because the page changes,
+through ADRs and through clarifications ([ADR-0015](../../../docs/adr/0015-adrs-for-hard-to-reverse-decisions.md)).
+Check against:
 
 - **Modules:** each file's module, from its path under `Packages/FinlarkKit`, may import only what its row in the
   table allows. Code under `Finlark/` belongs to the App target row.

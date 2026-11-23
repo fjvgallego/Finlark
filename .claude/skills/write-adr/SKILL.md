@@ -1,6 +1,6 @@
 ---
 name: write-adr
-description: Write an Architecture Decision Record for Finlark in docs/adr/. Use when an architecture, data model or dependency decision needs recording, or when the owner asks for an ADR.
+description: Write an Architecture Decision Record for Finlark in docs/adr/. Use when a decision is hard to reverse as ADR-0015 defines it, or when the owner asks for an ADR.
 ---
 
 # Write an ADR
@@ -27,7 +27,7 @@ Architecture, data model and dependency decisions are the owner's, with or witho
 ## 2. Number and name it
 
 - Take the next number in the [ADR index](../../../docs/adr/README.md): four digits, one above the highest. Numbers are
-  never reused.
+  never reused once merged into `main`.
 - File name: `docs/adr/NNNN-short-title.md`, lowercase and hyphenated.
 
 ## 3. Write it
