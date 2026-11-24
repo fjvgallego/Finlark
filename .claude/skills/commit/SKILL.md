@@ -34,7 +34,7 @@ the changes. If they didn't, stop and hand the change over as
 FIN-n: Imperative summary of up to 72 characters
 
 What changed and why, wrapped at 72 characters. Cite requirement
-IDs (SPL-003, NFR-005) and ADRs (ADR-0005) where they apply.
+IDs (TRX-003, NFR-005) and ADRs (ADR-0005) where they apply.
 
 <attribution trailer you were given>
 ```

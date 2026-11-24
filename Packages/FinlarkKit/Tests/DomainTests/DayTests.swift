@@ -4,7 +4,7 @@ import Testing
 @testable import Domain
 
 struct DayTests {
-    @Test("ADR-0012: days round-trip through yyyymmdd", arguments: [20_261_117, 20_240_229, 15_830_101, 99_991_231])
+    @Test("ADR-0016: days round-trip through yyyymmdd", arguments: [20_261_117, 20_240_229, 15_830_101, 99_991_231])
     func yyyymmddRoundTrip(yyyymmdd: Int) throws {
         let day = try #require(Day(yyyymmdd: yyyymmdd))
         #expect(day.yyyymmdd == yyyymmdd)

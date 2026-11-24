@@ -38,9 +38,9 @@ flowchart TD
 
 | Module | Owns | May import |
 |---|---|---|
-| `Domain` | Value types and pure rules: money, periods, splits, repayments, projection, recurrence dates, which notifications should exist | Foundation |
+| `Domain` | Value types and pure rules: money, periods, projection, recurrence dates, which notifications should exist | Foundation |
 | `Persistence` | `@Model` types, versioned schemas and migrations, use cases, the duplicate cleanup step | Domain, SwiftData |
-| `Services` | Notifications, App Lock, iCloud account status, per-device settings | Domain, Persistence, UserNotifications, LocalAuthentication, CloudKit |
+| `Services` | Notifications, App Lock (from 1.5), iCloud account status, per-device settings | Domain, Persistence, UserNotifications, LocalAuthentication, CloudKit |
 | `DesignSystem` | Components, styles and design tokens, with no knowledge of the domain | SwiftUI |
 | `Features` | Screens, drafts, the router | Domain, Persistence, Services, DesignSystem, SwiftUI |
 | App target | Entry point, `ModelContainer` setup, wiring into the Environment, assets, entitlements | Everything above |
@@ -49,33 +49,16 @@ flowchart TD
 
 ### Model
 
-The v1.0 schema is `SchemaV1` in Persistence ([ADR-0012](adr/0012-v1-data-model.md)):
+The v1.0 schema is `SchemaV1` in Persistence. It grows slice by slice: each feature adds the entities it needs when
+it's built, and can change earlier ones freely until 1.0 ships ([ADR-0016](adr/0016-data-model-per-slice.md)).
 
-```mermaid
-erDiagram
-    Account |o--o{ Transaction : holds
-    Category |o--o{ Transaction : labels
-    Transaction |o--o{ Share : "split into"
-    Transaction |o--o{ SplitItem : "itemized as"
-    SplitItem }o--o{ Share : "assigned to"
-    Person |o--o{ Share : owes
-    Share |o--o{ Repayment : "paid by"
-    RecurringTemplate |o--o{ TemplateRevision : "valued by"
-    RecurringTemplate |o--o{ OccurrenceRecord : "confirmed or skipped by"
-    Category |o--o{ TemplateRevision : labels
-    Category |o--o{ PlannedAmount : "planned by"
-```
-
-- The user's own share of a split is stored on the transaction. Share records exist only for people.
-- A recurring template's values live in its template revisions, each from a given day on. A month's plan for a
-  category is its latest planned amount from that month or before. Past months' values are never changed.
-- A transaction that comes from a template, by confirming or by *Make recurring*, stores the template's ID and the
-  occurrence date.
-- Dates without a time are stored as `yyyymmdd` integers, months as `yyyymm`, and enumerations as `String` raw values.
-  Days and months always use the Gregorian calendar, whatever calendar the user has chosen
+- Every entity has an `id: UUID` and a `createdAt: Date`. Relationships are optional, unordered and have an inverse,
+  with *Nullify* or *Cascade* delete rules, never *Deny*.
+- Enumerations are stored as `String` raw values. Dates without a time are stored as `yyyymmdd` integers and months
+  as `yyyymm`. Days and months always use the Gregorian calendar, whatever calendar the user has chosen
   ([ADR-0013](adr/0013-gregorian-days.md)).
-- Names, notes, amounts and what identifies a category (seed key, icon, color) are end-to-end encrypted in iCloud.
-- Everything else the screens show (balance, spending, statuses, pending items, projections) is calculated.
+- Everything the screens show that can be calculated (balance, spending, statuses, pending items, projections) is
+  calculated, not stored.
 
 ### Reading
 
@@ -97,9 +80,10 @@ View → draft (if the screen edits) → use case → Domain rules → models ch
 
 ### Money
 
-Amounts are stored as `Int64` counts of the currency's minor units, next to their ISO 4217 code. Domain works only in
-`Decimal`, and Persistence converts between the two. Balance, spending and projections are calculated, never stored
-([ADR-0005](adr/0005-money-storage.md), NFR-005).
+Amounts are stored as `Int64` counts of the currency's minor units. The ISO 4217 currency code is stored once, on the
+account. Domain works only in `Decimal`, and Persistence converts between the two. Balance, spending and projections
+are calculated, never stored ([ADR-0005](adr/0005-money-storage.md), [ADR-0016](adr/0016-data-model-per-slice.md),
+NFR-005).
 
 Domain's table of minor-unit digits is generated and append-only: a code is never removed and its digits never change
 ([ADR-0014](adr/0014-append-only-currency-table.md)).
@@ -125,11 +109,9 @@ Every monthly calculation goes through Domain's period type, so a custom month s
 - **Notifications** are recalculated rather than scheduled one at a time. Domain works out which notifications should
   exist, and Services adds or removes the difference. This runs at launch, on return to the foreground, after each
   save and when synced data arrives ([ADR-0003](adr/0003-module-structure.md)).
-- **App Lock** and the **iCloud account status** live in Services.
-- **Settings** for notifications, IOU reminder days and App Lock are per device, in `UserDefaults`. Everything else in
-  Settings is synced data ([ADR-0010](adr/0010-per-device-settings.md)). Each device also keeps there the shares it
-  has sent an IOU reminder for and the day it was set up, so a reminder fires once per share on that device and a new
-  device doesn't send reminders for old shares ([ADR-0012](adr/0012-v1-data-model.md)).
+- **App Lock** (from 1.5) and the **iCloud account status** live in Services.
+- **Settings** for notifications are per device, in `UserDefaults`. Everything else in Settings is synced data
+  ([ADR-0010](adr/0010-per-device-settings.md)).
 
 ## Navigation
 
@@ -154,8 +136,8 @@ measurement shows that it must ([ADR-0006](adr/0006-concurrency.md)).
 | Domain unit tests | Every rule, including the requirements' own examples |
 | Draft and router tests | Draft validation, which screen a route opens |
 | Persistence integration tests | Use cases, the duplicate cleanup step, migrations, on an in-memory store |
-| UI smoke tests | Onboarding, add an expense, split and repay, confirm a pending item |
-| Manual, before each release | iCloud sync, App Lock, notifications, accessibility and appearance, and a run on iOS 26, because CI tests on iOS 27 |
+| UI smoke tests | Onboarding, add an expense, set a plan, confirm a pending item |
+| Manual, before each release | iCloud sync, notifications, accessibility and appearance, and a run on iOS 26, because CI tests on iOS 27 |
 
 Swift Testing for everything except UI tests, which use XCUITest ([ADR-0007](adr/0007-testing-strategy.md), NFR-009).
 
@@ -179,10 +161,12 @@ Swift Testing for everything except UI tests, which use XCUITest ([ADR-0007](adr
 | Release | Builds on |
 |---|---|
 | 1.3 Custom month start | Domain's period type |
-| 2.0 App Intents | Use cases, and the router's `open(_:)` |
-| 2.2 Widgets | The App Group store, Domain |
-| 3.2 Multiple accounts | The multi-account data model (C-4) |
-| 3.4 Multi-currency | The currency code stored with every amount (C-4) |
+| 1.4 Plan history | A schema version for planned amounts per month |
+| 2.0 Bill splitting | A schema version for people, shares and repayments |
+| 3.0 App Intents | Use cases, and the router's `open(_:)` |
+| 3.2 Widgets | The App Group store, Domain |
+| 4.2 Multiple accounts | A schema version that adds transfers and a repayment's destination account ([ADR-0016](adr/0016-data-model-per-slice.md)) |
+| 4.4 Multi-currency | An optional currency code on amounts, where a missing code means the account's ([ADR-0016](adr/0016-data-model-per-slice.md)) |
 
 ## Rules
 
@@ -202,5 +186,7 @@ Check these in every code review:
 
 ## Not decided yet
 
-- How the app picks up data written by extensions (v2.0, v2.2).
+- How the app picks up data written by extensions (v3.0, v3.2).
+- Which fields are end-to-end encrypted in iCloud. Decided when CloudKit sync is set up, before 1.0 ships
+  ([ADR-0016](adr/0016-data-model-per-slice.md)).
 - How NFR-008 is measured (10,000 transactions).

@@ -1,6 +1,7 @@
 # ADR-0005: How amounts are stored
 
-Status: **Accepted** (2026-11-03) · Ticket: FIN-10 · Requirements: NFR-005, NFR-008, C-3, C-4, A-01
+Status: **Accepted** (2026-11-03) · Ticket: FIN-10 · Requirements: NFR-005, NFR-008, C-3, C-4, A-01 ·
+Refined by: [ADR-0016](0016-data-model-per-slice.md)
 
 ## Context
 

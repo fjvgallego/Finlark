@@ -133,7 +133,7 @@ NFR-003:
 - The same goes for documentation comments, public API included: none when the name and signature are enough.
 - No commented-out code.
 - Where the code implements a rule that isn't obvious, cite its ID: the requirement, or the ADR when no requirement
-  states it. For example `// A-03: the remainder goes to the user's share`.
+  states it. For example `// A-09: the pace part is hidden during the first 3 days of the month`.
 
 ## Logging
 
@@ -145,10 +145,10 @@ NFR-003:
 
 - Swift Testing, except UI tests ([ADR-0007](../adr/0007-testing-strategy.md)).
 - Display names start with the ID of the document that states the behavior the test asserts. That's the requirement
-  when it states it: `@Test("SPL-002: €100 among 3 gives the user €33.34")`. Otherwise it's the ADR:
+  when it states it: `@Test("ACC-001: a €120 expense lowers a €1,000 balance to €880")`. Otherwise it's the ADR:
   `@Test("ADR-0005: stored minor units round-trip through Decimal")`. Never an `architecture.md` rule number, because
   those can be renumbered. Every rule there comes from an ADR.
 - Test functions describe the behavior, without a `test` prefix, because `@Test` already marks them:
-  `func equalSplitGivesRemainderToUser()`. XCUITest methods keep the `test` prefix, which XCTest needs to find them.
+  `func expenseLowersBalance()`. XCUITest methods keep the `test` prefix, which XCTest needs to find them.
 - One behavior per test. Repeated cases use `arguments:`.
-- A test file is named after what it tests: `SplitSharesTests.swift`. No shared mutable state between tests.
+- A test file is named after what it tests: `BalanceTests.swift`. No shared mutable state between tests.

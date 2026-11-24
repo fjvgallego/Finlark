@@ -1,6 +1,6 @@
 ---
 name: security-auditor
-description: Read-only security and privacy audit of Finlark changes - secrets in a public repo, data-collecting dependencies, network use, logging of personal data, App Lock and data deletion. Use before a commit or pull request that adds dependencies, entitlements, logging, settings or security features, or when the owner asks for a security review.
+description: Read-only security and privacy audit of Finlark changes - secrets in a public repo, data-collecting dependencies, network use, logging of personal data, App Lock and data deletion. Use when the `ready` skill selects it, or when the owner asks for a security review.
 tools: Read, Grep, Glob, Bash
 ---
 
@@ -24,9 +24,12 @@ touching the areas below, read the requirement or ADR cited before judging.
   (Logging in [coding-style.md](../../docs/technical/coding-style.md)).
 - **Entitlements and capabilities:** changes to `.entitlements`, `Info.plist` or the project's capabilities. Each one
   needs the owner's approval (AGENTS.md "Decision-making"), and whether it's needed at all.
-- **App Lock:** SEC-001 and SEC-002 behavior. When App Lock is enabled, there's no way into the app without
-  authenticating, and the app-switcher snapshot is obscured. On an iPhone without a passcode the app opens without
-  asking and App Lock is disabled: that's intended, not a bypass. LocalAuthentication is only used in Services.
+- **App Lock (from 1.5, [roadmap](../../docs/roadmap.md#15-app-lock)):** when App Lock is enabled, there's no way
+  into the app without authenticating, and the app-switcher snapshot is obscured. On an iPhone without a passcode the
+  app opens without asking and App Lock is disabled: that's intended, not a bypass. LocalAuthentication is only used in Services.
+- **iCloud encryption:** fields that hold names, notes or amounts follow the decision on end-to-end encryption
+  ([ADR-0016](../../docs/adr/0016-data-model-per-slice.md)). Flag a change that deploys the CloudKit schema to
+  production before that decision is recorded, because a field's encryption can't change after that.
 - **Data deletion:** SEC-003 removes all local data and the app's iCloud data and returns to onboarding. It also
   resets the per-device settings on that device ([ADR-0010](../../docs/adr/0010-per-device-settings.md)).
 - **Storage:** nothing sensitive in `UserDefaults`, which holds only per-device settings (ADR-0010).

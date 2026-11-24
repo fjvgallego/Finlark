@@ -2,13 +2,17 @@
 
 ## Pitch
 
-**Finlark is a personal finance tracker for iPhone (later iPad, Mac and Apple Watch) that knows the difference
-between what you spend and what leaves your account.**
+**Finlark is a personal finance tracker for iPhone (later iPad, Mac and Apple Watch) that tells you early whether
+you're on track this month, and grows into one that knows the difference between what you spend and what leaves your
+account.**
 
-Pay a €120 dinner for four friends and most trackers record €120 of "Dining". Finlark records your €30 share as
-spending, keeps track of the €90 your friends owe you, and adds each repayment back to your balance as it arrives.
-A Monthly Plan sets how much you expect to spend per category, and a projection tells you early whether you're on
-track.
+v1.0 is the core. A Monthly Plan sets how much you expect to spend per category, and a projection tells you early
+whether you're on track ("at this pace you'll spend ~€230 on Leisure, plan €200"). Rent, subscriptions and salary
+wait as pending items until you confirm them, so nothing is entered wrong silently.
+
+v2.0 adds bill splitting. Pay a €120 dinner for four friends and most trackers record €120 of "Dining". Finlark
+records your €30 share as spending, keeps track of the €90 your friends owe you, and adds each repayment back to your
+balance as it arrives.
 
 Over time Finlark grows into an Apple-native showcase: App Intents, on-device intelligence with Foundation Models,
 and one experience across all of your Apple devices.
@@ -16,7 +20,7 @@ and one experience across all of your Apple devices.
 ## Who it is for
 
 - Individuals who want a clear, private view of their monthly spending without connecting a bank.
-- People who often pay for the group (dinners, tickets, trips) and lose track of who still owes them money.
+- People who often pay for the group (dinners, tickets, trips) and lose track of who still owes them money (from 2.0).
 - Apple users who expect an app that feels native and works across their devices.
 
 ## Principles
@@ -27,7 +31,7 @@ and one experience across all of your Apple devices.
    backend, no third-party analytics and no tracking. App Privacy target: *Data Not Collected*.
 3. **Apple-native first.** System frameworks (SwiftUI, SwiftData, CloudKit, Swift Charts, App Intents, Foundation
    Models) over third-party dependencies. Follow the current iOS design language.
-4. **Manual first, assisted later.** v1 makes manual entry fast and pleasant. Intelligence (v2) speeds it up and
+4. **Manual first, assisted later.** v1 makes manual entry fast and pleasant. Intelligence (3.0) speeds it up and
    always has a non-AI fallback.
 5. **The user decides.** Plans are set by the user. The app suggests and projects but never silently changes data
    (recurring items are confirmed, not auto-posted).
@@ -36,11 +40,12 @@ and one experience across all of your Apple devices.
 
 ## What makes it different
 
-- **Bill splitting with honest accounting.** Equal, exact or by item. Per-ticket repayment status plus *Settle all*.
 - **Monthly Plan + projection.** Per-category estimates and a pace projection ("at this pace you'll spend ~€230 on
   Leisure, plan €200").
 - **Confirm-to-post recurring items.** Rent, subscriptions and salary appear as pending when due, so nothing gets entered
   wrong silently.
+- **Bill splitting with honest accounting (2.0).** Equal, exact or by item. Per-ticket repayment status plus
+  *Settle all*.
 - **Later:** Siri/Shortcuts and Spotlight via App Intents, natural-language entry and receipt scanning with on-device
   Foundation Models, widgets, iPad, Mac and Watch.
 
@@ -50,7 +55,7 @@ and one experience across all of your Apple devices.
 - Investments, crypto, net-worth or loan tracking.
 - Ads, tracking or selling data.
 - Monetization in v1. It may be revisited later.
-- A full Splitwise replacement in v1. Friends don't need the app, and v1 only tracks money owed **to** you.
+- A full Splitwise replacement in 2.0. Friends don't need the app, and 2.0 only tracks money owed **to** you.
 - Explicitly dropped features: shares/percent split mode, "you owe them" splits (a friend paid), standalone receipt
   photo attachments, location on transactions.
 
@@ -58,6 +63,6 @@ and one experience across all of your Apple devices.
 
 - Approved and published on the App Store (iPhone, iOS 26+), in English and Spanish.
 - Every requirement in [requirements/v1.md](requirements/v1.md) meets its acceptance criteria.
-- Domain logic (balance, splits, repayments, projection, recurrence) is covered by automated tests that run in CI on
+- Domain logic (balance, spending, projection, recurrence) is covered by automated tests that run in CI on
   every pull request and on every push to `main`.
 - Data syncs to iCloud and restores correctly on a new iPhone.
