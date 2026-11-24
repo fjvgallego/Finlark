@@ -1,9 +1,11 @@
 # Architecture
 
-How Finlark is built today. This page says **what** the architecture is; the [ADRs](adr/README.md) say **why**. Each
-section links to the ADR behind it.
+How Finlark is built today. This page says **what** the architecture is; the [ADRs](adr/README.md) say **why**.
+Sections link to the ADRs behind them.
 
-Changing anything on this page needs an ADR, in the same commit. Terms follow the [glossary](glossary.md).
+A change to this page comes with an ADR in the same commit when
+[ADR-0015](adr/0015-adrs-for-hard-to-reverse-decisions.md) says the decision needs one. A clarification is edited in
+directly, with the owner's approval. Terms follow the [glossary](glossary.md).
 
 ## Constraints
 

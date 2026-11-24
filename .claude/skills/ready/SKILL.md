@@ -31,6 +31,8 @@ Start the chosen agents in parallel, in one message. Give each one:
   agent found each one.
 - Fix the findings that are unambiguous breaks of a written rule in code you wrote, then say what you fixed. If a fix
   is more than a few lines, ask first.
+- Apply docs-keeper's *Wording* findings with the replacement text it gives, and report them as fixed. The owner sees
+  them in the diff and the report.
 - List everything else for the owner: judgment calls, questions, and anything involving architecture, the data model,
   dependencies, UI/UX or scope.
 - Say which agents ran, which were skipped and why.

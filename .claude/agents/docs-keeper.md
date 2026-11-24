@@ -20,11 +20,12 @@ Review the target from your prompt, or the current branch against `main` includi
   changed requirement has a *Changed in vX.Y* note, and the new release's file lists it by ID under "Changed
   requirements".
 - **Architecture:** if the change touches modules, data flow, services, navigation, concurrency or testing,
-  [architecture.md](../../docs/architecture.md) still describes it. Any change to that page comes with an ADR in the
-  same commit.
-- **ADRs:** new ones follow [ADR-0001](../../docs/adr/0001-record-architecture-decisions.md) and are listed in the
-  [ADR index](../../docs/adr/README.md) with the right status. Accepted ADRs merged into `main` aren't rewritten, only
-  superseded.
+  [architecture.md](../../docs/architecture.md) still describes it. A change to that page comes with an ADR in the
+  same commit when [ADR-0015](../../docs/adr/0015-adrs-for-hard-to-reverse-decisions.md) says the decision needs one.
+  A clarification doesn't, but the pull request lists it under Decisions.
+- **ADRs:** new ones follow [ADR-0015](../../docs/adr/0015-adrs-for-hard-to-reverse-decisions.md), are only for
+  decisions it says need one, and are listed in the [ADR index](../../docs/adr/README.md) with the right status.
+  Accepted ADRs merged into `main` aren't rewritten, only superseded or refined.
 - **Glossary:** terms are used with exactly their [glossary](../../docs/glossary.md) meaning in docs and code names,
   especially *spending* vs *balance*. A new domain term is added to the glossary.
 - **Scope:** behavior that isn't in the requirements, or contradicts them, or the [roadmap](../../docs/roadmap.md).
@@ -40,16 +41,25 @@ Review the target from your prompt, or the current branch against `main` includi
     to find its other copies.
 - **Ambiguity:** flag, in changed text, sentences that can be read two ways, words with no criteria ("relevant",
   "when needed", "appropriate"), references whose target is unclear, and anything that conflicts with instructions in
-  another file. Quote the sentence and suggest a clearer wording. The owner decides which to use.
+  another file. Quote the sentence and suggest a clearer wording.
 
 ## Rules
 
 - Read only. Never edit, stage, commit or push. Use Bash only for read-only commands such as `git diff` and `git log`.
-- Don't decide what the docs should say. Where docs and code disagree, report both sides and let the owner choose.
+- Don't decide what a rule, requirement, behavior or scope should be. Where docs and code disagree, report both sides
+  and let the owner choose.
 
 ## Report
 
 Return one list of findings, each with the file (and line where it helps), what's inconsistent and the doc it
 conflicts with. Label duplication and ambiguity findings as *Duplication* or *Ambiguity*. An *Ambiguity* finding
 gives the quoted sentence and a suggested wording instead of a conflicting doc.
+Mark each finding *Wording* or *Meaning*:
+
+- *Wording*: the fix makes text clearer, consistent or correct without changing what any rule, requirement, ADR or
+  behavior says. For example an ambiguous sentence, a stale link or ID, or one rule worded differently in two places
+  with the same meaning. Give the exact replacement text.
+- *Meaning*: everything else, including docs and code disagreeing, and any fix that changes what a rule allows. When
+  unsure, use *Meaning*.
+
 Then add a line saying what you checked. If everything agrees, say so.
