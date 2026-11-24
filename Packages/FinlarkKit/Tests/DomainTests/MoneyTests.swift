@@ -158,7 +158,6 @@ struct MoneyTests {
     // MARK: - Rounding
 
     @Test(
-        "ADR-0012: rounding to the nearest minor unit takes halves away from zero",
         arguments: [
             ("10.555", "EUR", "10.56"),
             ("-10.555", "EUR", "-10.56"),
@@ -173,7 +172,6 @@ struct MoneyTests {
     }
 
     @Test(
-        "SPL-002: rounding toward zero drops what's past the minor unit",
         arguments: [
             ("33.3333", "EUR", "33.33"),
             ("66.6666", "EUR", "66.66"),
@@ -186,13 +184,10 @@ struct MoneyTests {
         #expect(try money(amount, code).rounded(.towardZero).amount == (try decimal(expected)))
     }
 
-    @Test(
-        "ADR-0012: a changed home currency rounds to its minor unit, halves away from zero",
-        arguments: [("10.55", "11"), ("10.00", "10"), ("12.34", "12")]
-    )
-    func changedCurrencyRoundsHalvesAwayFromZero(euros: String, yen: String) throws {
-        let rewritten = try money(euros, "JPY").rounded(.toNearestOrAwayFromZero)
-        #expect(try rewritten.minorUnits() == Int64(yen))
+    @Test(arguments: [("10.55", "11"), ("10.00", "10"), ("12.34", "12")])
+    func fewerMinorDigitsRoundHalvesAwayFromZero(amount: String, expected: String) throws {
+        let rounded = try money(amount, "JPY").rounded(.toNearestOrAwayFromZero)
+        #expect(try rounded.minorUnits() == Int64(expected))
     }
 
     // MARK: - Helpers

@@ -15,7 +15,8 @@ How ADRs are written: [ADR-0015](0015-adrs-for-hard-to-reverse-decisions.md).
 | [0009](0009-store-location.md) | Store location | Accepted |
 | [0010](0010-per-device-settings.md) | Per-device settings | Accepted |
 | [0011](0011-build-and-ci.md) | Build and CI | Accepted |
-| [0012](0012-v1-data-model.md) | The v1.0 data model | Accepted |
+| [0012](0012-v1-data-model.md) | The v1.0 data model | Superseded by ADR-0016 |
 | [0013](0013-gregorian-days.md) | Stored days are Gregorian, and Domain takes a time zone instead of a calendar | Accepted |
 | [0014](0014-append-only-currency-table.md) | The currency table is append-only and leaves out fund codes | Accepted |
 | [0015](0015-adrs-for-hard-to-reverse-decisions.md) | ADRs record only decisions that are hard to reverse | Accepted |
+| [0016](0016-data-model-per-slice.md) | The data model grows slice by slice, with one currency on the account | Accepted |

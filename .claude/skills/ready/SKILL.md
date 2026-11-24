@@ -1,6 +1,6 @@
 ---
 name: ready
-description: Check that a Finlark change is ready for the owner's review by running the review agents (code-reviewer, docs-keeper, security-auditor) in parallel, merging their findings and saving the report for the ticket. Use before handing a change to the owner, or when the owner asks if a change is ready.
+description: Check that a Finlark change is ready for the owner's review by running the review agents the change needs (code-reviewer, docs-keeper, security-auditor) in parallel, merging their findings and saving the report for the ticket. Use before handing a change to the owner, or when the owner asks if a change is ready.
 ---
 
 # Ready for review
@@ -16,7 +16,13 @@ The owner's target if they gave one. Otherwise the current branch against `main`
 |---|---|
 | `code-reviewer` | Any `.swift` file outside `Finlark/DesignExplorations/` (`Package.swift` included), `Finlark.xctestplan`, `project.pbxproj`, or any file in `.github/workflows/` |
 | `docs-keeper` | `docs/`, `AGENTS.md`, `.claude/` skills and agents, `.github/`, or Swift behavior that a requirement, ADR or `architecture.md` describes |
-| `security-auditor` | Always. The repository is public, so a secret can land in any file. |
+| `security-auditor` | Anything `code-reviewer` runs for, plus `Package.resolved`, `skills-lock.json`, `.entitlements`, `Info.plist`, or `.claude/agents/security-auditor.md` |
+
+When `security-auditor` doesn't run, check for secrets yourself, because the repository is public. Search the
+branch's commits (`git log -p main..HEAD`), the uncommitted changes (`git diff`) and the untracked files
+(`git status --short`) for keys, tokens, passwords, certificates, provisioning profiles and personal data, and list
+any file with a certificate or profile extension (`.p12`, `.cer`, `.mobileprovision`). Say in the report what you
+scanned.
 
 ## 3. Run them
 
@@ -50,7 +56,7 @@ so earlier runs are kept. Each run is one entry:
 Ran: docs-keeper, security-auditor. Skipped: code-reviewer (no Swift or build files).
 
 - [docs-keeper] `docs/technical/git-workflow.md:40`: the finding. **Fixed:** what changed.
-- [security-auditor] `.gitignore:29`: the finding. **For the owner:** the question.
+- [security-auditor] `skills-lock.json:12`: the finding. **For the owner:** the question.
 ```
 
 - If nothing was found, the entry says so.

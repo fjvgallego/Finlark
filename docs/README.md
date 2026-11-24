@@ -26,7 +26,7 @@ Created when their step starts, not before:
 
 ## Conventions
 
-- **Requirement IDs** (`SPL-003`, `NFR-005`…) are stable. They are never renumbered or reused. A removed requirement
+- **Requirement IDs** (`TRX-003`, `NFR-005`…) are stable. They are never renumbered or reused. A removed requirement
   is marked *Withdrawn* and keeps its ID.
 - Jira tickets, tests and ADRs reference requirement IDs. Tests and code comments cite an ADR instead when no
   requirement states the rule ([coding-style.md](technical/coding-style.md)).

@@ -3,7 +3,7 @@ import Testing
 @testable import Domain
 
 struct PeriodTests {
-    @Test("ADR-0012: periods round-trip through yyyymm", arguments: [202_611, 202_601, 158_301, 999_912])
+    @Test("ADR-0016: periods round-trip through yyyymm", arguments: [202_611, 202_601, 158_301, 999_912])
     func yyyymmRoundTrip(yyyymm: Int) throws {
         let period = try #require(Period(yyyymm: yyyymm))
         #expect(period.yyyymm == yyyymm)

@@ -14,10 +14,18 @@ Product documentation lives in [docs/](docs/README.md) and is the source of trut
 - For these, present 2–3 options with trade-offs and a recommendation, then wait for an answer.
 - Decide everything else yourself and list those choices in your summary.
 
+### Way of working
+- Work in vertical slices: one feature at a time, from data model to screen, with its tests. Don't design or build
+  for a feature before its slice starts. Later releases get seams only where requirements/v1.md and architecture.md
+  name them (for example NFR-011 and the period type). For the data model, see
+  [ADR-0016](docs/adr/0016-data-model-per-slice.md).
+- Raise only the decisions the current slice needs.
+
 ### Architecture
 - Before writing or changing code, read [docs/architecture.md](docs/architecture.md) and follow its rules.
-- A decision that is hard to reverse is recorded in an [ADR](docs/adr/README.md) approved by the owner.
-  [ADR-0015](docs/adr/0015-adrs-for-hard-to-reverse-decisions.md) says which decisions those are.
+- A decision that is hard to reverse is recorded in an [ADR](docs/adr/README.md) approved by the owner. It's made when
+  the slice that needs it is built. [ADR-0015](docs/adr/0015-adrs-for-hard-to-reverse-decisions.md) says which
+  decisions those are.
 
 ### Coding style
 - Write Swift following [docs/technical/coding-style.md](docs/technical/coding-style.md).
